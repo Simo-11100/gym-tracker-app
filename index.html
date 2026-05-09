@@ -211,16 +211,15 @@ import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChang
 import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, query, orderBy }
   from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
-// ⬇⬇⬇ KORVAA TÄMÄ OMAN FIREBASE-PROJEKTIN ARVOILLA ⬇⬇⬇
 const firebaseConfig = {
-  apiKey: "PASTE_FIREBASE_API_KEY",
-  authDomain: "PASTE.firebaseapp.com",
-  projectId: "PASTE",
-  storageBucket: "PASTE.appspot.com",
-  messagingSenderId: "PASTE",
-  appId: "PASTE"
+  apiKey: "AIzaSyAg19N5qHKPWAH36MBpuCCKK8pYxRN4pAU",
+  authDomain: "gym-tracker-a3c40.firebaseapp.com",
+  projectId: "gym-tracker-a3c40",
+  storageBucket: "gym-tracker-a3c40.firebasestorage.app",
+  messagingSenderId: "590529779149",
+  appId: "1:590529779149:web:825a5a79154e33d4dc2084",
+  measurementId: "G-HSJ84XY40F"
 };
-// ⬆⬆⬆ KORVAA TÄMÄ OMAN FIREBASE-PROJEKTIN ARVOILLA ⬆⬆⬆
 
 const GEMINI_MODEL = 'gemini-2.5-flash';
 const $ = (id) => document.getElementById(id);
