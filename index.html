@@ -141,6 +141,66 @@ details summary { cursor: pointer; }
 .signin-card { text-align: center; padding: 2rem 1.25rem; }
 .signin-card p { margin-bottom: 1rem; color: var(--muted); }
 code { background: var(--bg); padding: 0.1rem 0.3rem; border-radius: 4px; font-size: 0.85em; }
+.stepper {
+  display: flex;
+  gap: 0.4rem;
+  align-items: stretch;
+}
+.stepper input {
+  flex: 1;
+  text-align: center;
+  font-size: 1.1rem;
+  font-weight: 600;
+  min-width: 0;
+}
+.step-btn {
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  font-weight: 600;
+  font-size: 0.95rem;
+  padding: 0.55rem 0.6rem;
+  min-width: 2.8rem;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+.step-btn:hover:not(:disabled) { border-color: var(--accent); opacity: 1; }
+.step-btn:active { background: var(--card); }
+.sets-list { display: flex; flex-direction: column; gap: 0.4rem; }
+.set-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: var(--bg);
+  border-radius: 6px;
+  padding: 0.45rem 0.55rem;
+}
+.set-label {
+  font-size: 0.82rem;
+  color: var(--muted);
+  flex: 0 0 4rem;
+}
+.rep-count {
+  flex: 1;
+  text-align: center;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+.set-row .step-btn { min-width: 2.4rem; padding: 0.45rem 0.5rem; }
+.set-row .remove-btn {
+  background: transparent;
+  color: var(--danger);
+  border: 1px solid var(--border);
+  padding: 0.4rem 0.65rem;
+  font-size: 1rem;
+  cursor: pointer;
+  border-radius: 8px;
+}
+.set-row .remove-btn:hover { border-color: var(--danger); }
+@media (max-width: 480px) {
+  .step-btn { min-width: 2.3rem; padding: 0.45rem 0.4rem; font-size: 0.9rem; }
+  .set-label { flex: 0 0 3.5rem; font-size: 0.78rem; }
+}
 </style>
 </head>
 <body>
@@ -182,12 +242,79 @@ Avaa <code>index.html</code> ja korvaa <code>firebaseConfig</code>-objekti omill
         <label for="sessionDate">Päivämäärä</label>
         <input type="date" id="sessionDate">
       </div>
-      <div class="form-row exercise">
-        <input type="text" id="exerciseName" placeholder="Liike (esim. Penkkipunnerrus)">
-        <input type="number" id="exerciseWeight" placeholder="kg" min="0" step="0.5">
-        <input type="text" id="exerciseReps" placeholder="Toistot (esim. 10+10+10)">
-        <button id="addExercise" class="secondary">Lisää</button>
+      <div class="form-row">
+        <label for="exerciseName">Liike</label>
+        <input type="text" id="exerciseName" list="exerciseList" placeholder="Aloita kirjoittaminen tai valitse listalta…" autocomplete="off">
+        <datalist id="exerciseList">
+          <option value="Penkkipunnerrus"></option>
+          <option value="Vinopenkkipunnerrus"></option>
+          <option value="Pystypunnerrus"></option>
+          <option value="Sivuvipunosto"></option>
+          <option value="Etuvipunosto"></option>
+          <option value="Hauiskääntö"></option>
+          <option value="Ojentajan punnerrus"></option>
+          <option value="Kyykky"></option>
+          <option value="Etukyykky"></option>
+          <option value="Maastaveto"></option>
+          <option value="Romanialainen maastaveto"></option>
+          <option value="Reisiojennus"></option>
+          <option value="Reisikoukistus"></option>
+          <option value="Pohjepunnerrus"></option>
+          <option value="Pakaranojennus"></option>
+          <option value="Leuanveto"></option>
+          <option value="Dippi"></option>
+          <option value="Kulmasoutu"></option>
+          <option value="Ylätalja"></option>
+          <option value="Alatalja"></option>
+          <option value="Lankku"></option>
+          <option value="Vatsarutistus"></option>
+          <option value="Etunoja"></option>
+          <option value="Selän ojennus"></option>
+          <option value="Bench press"></option>
+          <option value="Incline bench press"></option>
+          <option value="Overhead press"></option>
+          <option value="Lateral raise"></option>
+          <option value="Front raise"></option>
+          <option value="Bicep curl"></option>
+          <option value="Tricep extension"></option>
+          <option value="Squat"></option>
+          <option value="Front squat"></option>
+          <option value="Deadlift"></option>
+          <option value="Romanian deadlift"></option>
+          <option value="Leg extension"></option>
+          <option value="Leg curl"></option>
+          <option value="Calf raise"></option>
+          <option value="Hip thrust"></option>
+          <option value="Pull-up"></option>
+          <option value="Dip"></option>
+          <option value="Barbell row"></option>
+          <option value="Lat pulldown"></option>
+          <option value="Cable row"></option>
+          <option value="Plank"></option>
+          <option value="Crunch"></option>
+          <option value="Push-up"></option>
+          <option value="Back extension"></option>
+        </datalist>
       </div>
+
+      <div class="form-row">
+        <label>Paino (kg)</label>
+        <div class="stepper">
+          <button type="button" class="step-btn" data-weight="-5">−5</button>
+          <button type="button" class="step-btn" data-weight="-1">−1</button>
+          <input type="number" id="exerciseWeight" min="0" step="0.5" value="0" inputmode="decimal">
+          <button type="button" class="step-btn" data-weight="1">+1</button>
+          <button type="button" class="step-btn" data-weight="5">+5</button>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <label>Sarjat × Toistot</label>
+        <div id="setsList" class="sets-list"></div>
+        <button type="button" id="addSet" class="secondary" style="width: 100%; margin-top: 0.4rem;">+ Lisää sarja</button>
+      </div>
+
+      <button type="button" id="addExercise" class="secondary" style="width: 100%; margin-top: 0.25rem;">Lisää liike sessioon</button>
       <div class="exercises-list" id="exercisesList"></div>
       <button id="submitSession" style="width: 100%;">Tallenna &amp; pyydä suositus</button>
     </div>
@@ -281,25 +408,78 @@ function startApp() {
     setTimeout(() => ($('saveKey').textContent = 'Tallenna avain'), 1500);
   });
 
-  $('addExercise').addEventListener('click', addExercise);
-  $('exerciseReps').addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') addExercise();
+  let currentSets = [10];
+
+  function renderSets() {
+    const list = $('setsList');
+    list.innerHTML = currentSets.map((reps, i) => `
+      <div class="set-row">
+        <span class="set-label">Sarja ${i + 1}</span>
+        <button type="button" class="step-btn" data-rep-set="${i}" data-rep-delta="-1">−</button>
+        <span class="rep-count">${reps}</span>
+        <button type="button" class="step-btn" data-rep-set="${i}" data-rep-delta="1">+</button>
+        <button type="button" class="remove-btn" data-remove-set="${i}" title="Poista sarja">×</button>
+      </div>
+    `).join('');
+    list.querySelectorAll('[data-rep-delta]').forEach(b => {
+      b.addEventListener('click', () => {
+        const i = parseInt(b.dataset.repSet, 10);
+        const d = parseInt(b.dataset.repDelta, 10);
+        currentSets[i] = Math.max(1, currentSets[i] + d);
+        renderSets();
+      });
+    });
+    list.querySelectorAll('[data-remove-set]').forEach(b => {
+      b.addEventListener('click', () => {
+        const i = parseInt(b.dataset.removeSet, 10);
+        currentSets.splice(i, 1);
+        if (currentSets.length === 0) currentSets = [10];
+        renderSets();
+      });
+    });
+  }
+  renderSets();
+
+  $('addSet').addEventListener('click', () => {
+    const last = currentSets[currentSets.length - 1] || 10;
+    currentSets.push(last);
+    renderSets();
   });
+
+  document.querySelectorAll('[data-weight]').forEach(b => {
+    b.addEventListener('click', () => {
+      const delta = parseFloat(b.dataset.weight);
+      const input = $('exerciseWeight');
+      const current = parseFloat(input.value) || 0;
+      input.value = Math.max(0, +(current + delta).toFixed(2));
+    });
+  });
+
+  $('addExercise').addEventListener('click', addExercise);
 
   function addExercise() {
     const name = $('exerciseName').value.trim();
     const weight = parseFloat($('exerciseWeight').value);
-    const reps = $('exerciseReps').value.trim();
-    if (!name || isNaN(weight) || !reps) {
-      alert('Täytä kaikki liikkeen kentät.');
+    if (!name) {
+      alert('Valitse tai kirjoita liikkeen nimi.');
       return;
     }
+    if (isNaN(weight) || weight < 0) {
+      alert('Anna kelvollinen paino.');
+      return;
+    }
+    if (currentSets.length === 0) {
+      alert('Lisää vähintään yksi sarja.');
+      return;
+    }
+    const reps = currentSets.join('+');
     currentExercises.push({ name, weight, reps });
     $('exerciseName').value = '';
-    $('exerciseWeight').value = '';
-    $('exerciseReps').value = '';
-    $('exerciseName').focus();
+    $('exerciseWeight').value = '0';
+    currentSets = [10];
+    renderSets();
     renderCurrentExercises();
+    $('exerciseName').focus();
   }
 
   function renderCurrentExercises() {
