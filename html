@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gym Tracker</title>
+<style>
+:root {
+  --bg: #0f0f10;
+  --card: #1a1a1d;
+  --border: #2a2a2e;
+  --text: #e8e8e8;
+  --muted: #8a8a8a;
+  --accent: #4ade80;
+  --danger: #f87171;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  padding: 2rem 1rem;
+  line-height: 1.5;
+}
+.container { max-width: 720px; margin: 0 auto; }
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+h1 { font-size: 1.75rem; font-weight: 600; }
+h2 { font-size: 1.1rem; margin-bottom: 0.75rem; font-weight: 500; color: var(--muted); }
+.user-info { font-size: 0.85rem; color: var(--muted); display: flex; align-items: center; gap: 0.5rem; }
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin-bottom: 1rem;
+}
+input, button, select, textarea {
+  font-family: inherit;
+  font-size: 0.95rem;
+  padding: 0.6rem 0.9rem;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+}
+input:focus { outline: none; border-color: var(--accent); }
+input[type="date"] { width: 100%; }
+.form-row { display: grid; gap: 0.5rem; margin-bottom: 0.75rem; }
+.form-row.exercise { grid-template-columns: 2fr 1fr 2fr auto; }
+@media (max-width: 560px) {
+  .form-row.exercise { grid-template-columns: 1fr; }
+}
+button {
+  cursor: pointer;
+  background: var(--accent);
+  color: #000;
+  border: none;
+  font-weight: 600;
+  transition: opacity 0.15s;
+}
+button:hover:not(:disabled) { opacity: 0.9; }
+button:disabled { opacity: 0.5; cursor: not-allowed; }
+button.secondary {
+  background: transparent;
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+button.danger {
+  background: transparent;
+  color: var(--danger);
+  border: 1px solid var(--danger);
+  padding: 0.3rem 0.6rem;
+  font-size: 0.85rem;
+}
+.exercises-list { margin: 0.75rem 0; }
+.exercise-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background: var(--bg);
+  border-radius: 6px;
+  margin-bottom: 0.4rem;
+  font-size: 0.9rem;
+}
+label {
+  font-size: 0.85rem;
+  color: var(--muted);
+  display: block;
+  margin-bottom: 0.25rem;
+}
+.response {
+  white-space: pre-wrap;
+  padding: 1rem;
+  background: var(--bg);
+  border-radius: 8px;
+  border-left: 3px solid var(--accent);
+  font-size: 0.95rem;
+}
+.history-item {
+  padding: 0.75rem;
+  background: var(--bg);
+  border-radius: 8px;
+  margin-bottom: 0.5rem;
+}
+.history-item summary { font-weight: 500; }
+.history-item pre {
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+  white-space: pre-wrap;
+  color: var(--muted);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+details summary { cursor: pointer; }
+.loading { color: var(--muted); font-style: italic; }
+.error {
+  color: var(--danger);
+  background: rgba(248, 113, 113, 0.1);
+  padding: 0.75rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  white-space: pre-wrap;
+}
+.empty {
+  color: var(--muted);
+  font-style: italic;
+  font-size: 0.9rem;
+  text-align: center;
+  padding: 1rem;
+}
+.hint { font-size: 0.8rem; color: var(--muted); margin-top: 0.5rem; }
+.signin-card { text-align: center; padding: 2rem 1.25rem; }
+.signin-card p { margin-bottom: 1rem; color: var(--muted); }
+code { background: var(--bg); padding: 0.1rem 0.3rem; border-radius: 4px; font-size: 0.85em; }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>Gym Tracker</h1>
+    <div class="user-info" id="userInfo"></div>
+  </header>
+
+  <div class="card" id="configError" style="display: none;">
+    <div class="error">
+Firebase-asetukset puuttuvat.
+Avaa <code>index.html</code> ja korvaa <code>firebaseConfig</code>-objekti omilla arvoilla Firebase-konsolista.
+    </div>
+  </div>
+
+  <div class="card signin-card" id="signInCard" style="display: none;">
+    <p>Kirjaudu sisään tallentaaksesi harjoitukset ja synkkaa ne kaikille laitteille.</p>
+    <button id="signInBtn">Kirjaudu Googlella</button>
+    <div class="hint" id="signInError" style="color: var(--danger); display: none;"></div>
+  </div>
+
+  <div id="appArea" style="display: none;">
+    <div class="card">
+      <details>
+        <summary style="color: var(--muted); font-size: 0.9rem;">API-asetukset</summary>
+        <div style="margin-top: 0.75rem;">
+          <label for="apikey">Gemini API-avain</label>
+          <input type="password" id="apikey" placeholder="AIza..." style="width: 100%;">
+          <button id="saveKey" class="secondary" style="margin-top: 0.5rem;">Tallenna avain</button>
+          <div class="hint">Tallennetaan vain selaimen localStorageen. Ei koskaan lähde Firestoreen tai repositorioon.</div>
+        </div>
+      </details>
+    </div>
+
+    <div class="card">
+      <h2>Uusi harjoitus</h2>
+      <div class="form-row">
+        <label for="sessionDate">Päivämäärä</label>
+        <input type="date" id="sessionDate">
+      </div>
+      <div class="form-row exercise">
+        <input type="text" id="exerciseName" placeholder="Liike (esim. Penkkipunnerrus)">
+        <input type="number" id="exerciseWeight" placeholder="kg" min="0" step="0.5">
+        <input type="text" id="exerciseReps" placeholder="Toistot (esim. 10+10+10)">
+        <button id="addExercise" class="secondary">Lisää</button>
+      </div>
+      <div class="exercises-list" id="exercisesList"></div>
+      <button id="submitSession" style="width: 100%;">Tallenna &amp; pyydä suositus</button>
+    </div>
+
+    <div class="card" id="responseCard" style="display: none;">
+      <h2>AI-suositus</h2>
+      <div id="response"></div>
+    </div>
+
+    <div class="card">
+      <h2>Historia</h2>
+      <div id="history"></div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged }
+  from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, query, orderBy }
+  from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
+// ⬇⬇⬇ KORVAA TÄMÄ OMAN FIREBASE-PROJEKTIN ARVOILLA ⬇⬇⬇
+const firebaseConfig = {
+  apiKey: "PASTE_FIREBASE_API_KEY",
+  authDomain: "PASTE.firebaseapp.com",
+  projectId: "PASTE",
+  storageBucket: "PASTE.appspot.com",
+  messagingSenderId: "PASTE",
+  appId: "PASTE"
+};
+// ⬆⬆⬆ KORVAA TÄMÄ OMAN FIREBASE-PROJEKTIN ARVOILLA ⬆⬆⬆
+
+const GEMINI_MODEL = 'gemini-2.5-flash';
+const $ = (id) => document.getElementById(id);
+
+if (firebaseConfig.apiKey === "PASTE_FIREBASE_API_KEY") {
+  $('configError').style.display = 'block';
+} else {
+  startApp();
+}
+
+function startApp() {
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+  const provider = new GoogleAuthProvider();
+
+  let currentUser = null;
+  let currentExercises = [];
+
+  $('sessionDate').value = new Date().toISOString().slice(0, 10);
+  $('apikey').value = localStorage.getItem('gemini_api_key') || '';
+
+  onAuthStateChanged(auth, (user) => {
+    currentUser = user;
+    if (user) {
+      $('signInCard').style.display = 'none';
+      $('appArea').style.display = 'block';
+      $('userInfo').innerHTML = '';
+      const label = document.createElement('span');
+      label.textContent = user.displayName || user.email || 'Kirjautunut';
+      const out = document.createElement('button');
+      out.className = 'secondary';
+      out.style.cssText = 'padding: 0.3rem 0.6rem; font-size: 0.85rem;';
+      out.textContent = 'Ulos';
+      out.addEventListener('click', () => signOut(auth));
+      $('userInfo').append(label, out);
+      renderHistory();
+    } else {
+      $('signInCard').style.display = 'block';
+      $('appArea').style.display = 'none';
+      $('userInfo').innerHTML = '';
+    }
+  });
+
+  $('signInBtn').addEventListener('click', async () => {
+    $('signInError').style.display = 'none';
+    try {
+      await signInWithPopup(auth, provider);
+    } catch (e) {
+      $('signInError').textContent = 'Kirjautuminen epäonnistui: ' + e.message;
+      $('signInError').style.display = 'block';
+    }
+  });
+
+  $('saveKey').addEventListener('click', () => {
+    const key = $('apikey').value.trim();
+    localStorage.setItem('gemini_api_key', key);
+    $('saveKey').textContent = 'Tallennettu';
+    setTimeout(() => ($('saveKey').textContent = 'Tallenna avain'), 1500);
+  });
+
+  $('addExercise').addEventListener('click', addExercise);
+  $('exerciseReps').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') addExercise();
+  });
+
+  function addExercise() {
+    const name = $('exerciseName').value.trim();
+    const weight = parseFloat($('exerciseWeight').value);
+    const reps = $('exerciseReps').value.trim();
+    if (!name || isNaN(weight) || !reps) {
+      alert('Täytä kaikki liikkeen kentät.');
+      return;
+    }
+    currentExercises.push({ name, weight, reps });
+    $('exerciseName').value = '';
+    $('exerciseWeight').value = '';
+    $('exerciseReps').value = '';
+    $('exerciseName').focus();
+    renderCurrentExercises();
+  }
+
+  function renderCurrentExercises() {
+    const list = $('exercisesList');
+    if (currentExercises.length === 0) {
+      list.innerHTML = '';
+      return;
+    }
+    list.innerHTML = currentExercises.map((ex, i) => `
+      <div class="exercise-item">
+        <span><strong>${escapeHtml(ex.name)}</strong> — ${ex.weight}kg × ${escapeHtml(ex.reps)}</span>
+        <button class="danger" data-remove="${i}">Poista</button>
+      </div>
+    `).join('');
+    list.querySelectorAll('[data-remove]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        currentExercises.splice(parseInt(btn.dataset.remove, 10), 1);
+        renderCurrentExercises();
+      });
+    });
+  }
+
+  $('submitSession').addEventListener('click', async () => {
+    if (!currentUser) return;
+    if (currentExercises.length === 0) {
+      alert('Lisää vähintään yksi liike.');
+      return;
+    }
+    const apiKey = localStorage.getItem('gemini_api_key');
+    if (!apiKey) {
+      alert('Aseta ensin Gemini API-avaimesi (API-asetukset).');
+      return;
+    }
+
+    const date = $('sessionDate').value;
+    const exercises = {};
+    for (const ex of currentExercises) {
+      exercises[ex.name] = { weight: ex.weight, reps: ex.reps };
+    }
+    const session = {
+      name: `Training ${date}`,
+      date,
+      exercises,
+      createdAt: new Date().toISOString(),
+    };
+
+    const btn = $('submitSession');
+    btn.disabled = true;
+    btn.textContent = 'Tallennetaan…';
+    $('responseCard').style.display = 'block';
+    $('response').innerHTML = '<div class="loading">Tallennetaan Firestoreen…</div>';
+
+    try {
+      await addDoc(collection(db, 'users', currentUser.uid, 'sessions'), session);
+    } catch (e) {
+      $('response').innerHTML = `<div class="error">Tallennus epäonnistui: ${escapeHtml(e.message)}</div>`;
+      btn.disabled = false;
+      btn.textContent = 'Tallenna & pyydä suositus';
+      return;
+    }
+
+    btn.textContent = 'Pyydetään suositusta…';
+    $('response').innerHTML = '<div class="loading">Gemini miettii…</div>';
+
+    try {
+      const history = await fetchHistory();
+      const rec = await getRecommendation(session, history, apiKey);
+      $('response').innerHTML = `<div class="response">${escapeHtml(rec)}</div>`;
+    } catch (e) {
+      $('response').innerHTML = `<div class="error">Gemini-virhe: ${escapeHtml(e.message)}</div>`;
+    }
+
+    currentExercises = [];
+    renderCurrentExercises();
+    renderHistory();
+
+    btn.disabled = false;
+    btn.textContent = 'Tallenna & pyydä suositus';
+  });
+
+  async function fetchHistory() {
+    if (!currentUser) return [];
+    const q = query(
+      collection(db, 'users', currentUser.uid, 'sessions'),
+      orderBy('createdAt', 'desc')
+    );
+    const snap = await getDocs(q);
+    return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  }
+
+  async function getRecommendation(currentSession, allHistory, apiKey) {
+    const prior = allHistory.slice(1);
+    const priorText = prior.length === 0
+      ? 'Ei aiempaa historiaa.'
+      : prior.map(s => `${s.name}:\n${Object.entries(s.exercises).map(([k, v]) => `  - ${k}: ${v.weight}kg × ${v.reps}`).join('\n')}`).join('\n\n');
+
+    const prompt = `Olet kuntosalivalmentaja. Käy läpi nykyinen harjoitus ja aiempi historia ja kerro jokaiselle liikkeelle erikseen: pidetäänkö sama paino seuraavalla kerralla vai nostetaanko (ja jos nostetaan, niin kuinka paljon).
+
+Nykyinen harjoitus (${currentSession.date}):
+${Object.entries(currentSession.exercises).map(([k, v]) => `- ${k}: ${v.weight}kg × ${v.reps}`).join('\n')}
+
+Aiemmat harjoitukset:
+${priorText}
+
+Vastaa jokaiselle liikkeelle omalle rivilleen muodossa:
+- <Liike>: PIDÄ <paino>kg — <lyhyt perustelu>
+- <Liike>: NOSTA <paino>kg — <lyhyt perustelu>
+Ole lyhytsanainen ja käytännöllinen.`;
+
+    const res = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${encodeURIComponent(apiKey)}`,
+      {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: { temperature: 0.4, maxOutputTokens: 1024 },
+        }),
+      }
+    );
+    if (!res.ok) {
+      const errText = await res.text();
+      throw new Error(`${res.status}: ${errText}`);
+    }
+    const data = await res.json();
+    const text = data?.candidates?.[0]?.content?.parts?.map(p => p.text).join('') || '';
+    if (!text) throw new Error('Tyhjä vastaus Geminiltä.');
+    return text.trim();
+  }
+
+  async function renderHistory() {
+    const el = $('history');
+    el.innerHTML = '<div class="loading">Ladataan…</div>';
+    try {
+      const history = await fetchHistory();
+      if (history.length === 0) {
+        el.innerHTML = '<div class="empty">Ei vielä harjoituksia.</div>';
+        return;
+      }
+      el.innerHTML = history.map(s => {
+        const { id, ...rest } = s;
+        return `
+          <details class="history-item">
+            <summary>${escapeHtml(s.name)}</summary>
+            <pre>${escapeHtml(JSON.stringify(rest, null, 2))}</pre>
+            <button class="danger" data-delete="${id}" style="margin-top: 0.5rem;">Poista</button>
+          </details>
+        `;
+      }).join('');
+      el.querySelectorAll('[data-delete]').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+          e.preventDefault();
+          if (!confirm('Poistetaanko harjoitus?')) return;
+          try {
+            await deleteDoc(doc(db, 'users', currentUser.uid, 'sessions', btn.dataset.delete));
+            renderHistory();
+          } catch (err) {
+            alert('Poisto epäonnistui: ' + err.message);
+          }
+        });
+      });
+    } catch (e) {
+      el.innerHTML = `<div class="error">Historian lataus epäonnistui: ${escapeHtml(e.message)}</div>`;
+    }
+  }
+}
+
+function escapeHtml(s) {
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+</script>
+</body>
+</html>
