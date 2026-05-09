@@ -12,23 +12,26 @@
   --text: #e8e8e8;
   --muted: #8a8a8a;
   --accent: #4ade80;
+  --warn: #fbbf24;
   --danger: #f87171;
+  --info: #60a5fa;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
+html { color-scheme: dark; }
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   background: var(--bg);
   color: var(--text);
   min-height: 100vh;
-  padding: 2rem 1rem;
+  padding: 1.5rem 1rem 4rem;
   line-height: 1.5;
 }
-.container { max-width: 720px; margin: 0 auto; }
+.container { max-width: 760px; margin: 0 auto; }
 header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.25rem;
   gap: 1rem;
   flex-wrap: wrap;
 }
@@ -54,10 +57,6 @@ input, button, select, textarea {
 input:focus { outline: none; border-color: var(--accent); }
 input[type="date"] { width: 100%; }
 .form-row { display: grid; gap: 0.5rem; margin-bottom: 0.75rem; }
-.form-row.exercise { grid-template-columns: 2fr 1fr 2fr auto; }
-@media (max-width: 560px) {
-  .form-row.exercise { grid-template-columns: 1fr; }
-}
 button {
   cursor: pointer;
   background: var(--accent);
@@ -112,7 +111,7 @@ label {
   border-radius: 8px;
   margin-bottom: 0.5rem;
 }
-.history-item summary { font-weight: 500; }
+.history-item summary { font-weight: 500; cursor: pointer; }
 .history-item pre {
   margin-top: 0.5rem;
   font-size: 0.8rem;
@@ -120,7 +119,6 @@ label {
   color: var(--muted);
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
 }
-details summary { cursor: pointer; }
 .loading { color: var(--muted); font-style: italic; }
 .error {
   color: var(--danger);
@@ -141,18 +139,8 @@ details summary { cursor: pointer; }
 .signin-card { text-align: center; padding: 2rem 1.25rem; }
 .signin-card p { margin-bottom: 1rem; color: var(--muted); }
 code { background: var(--bg); padding: 0.1rem 0.3rem; border-radius: 4px; font-size: 0.85em; }
-.stepper {
-  display: flex;
-  gap: 0.4rem;
-  align-items: stretch;
-}
-.stepper input {
-  flex: 1;
-  text-align: center;
-  font-size: 1.1rem;
-  font-weight: 600;
-  min-width: 0;
-}
+.stepper { display: flex; gap: 0.4rem; align-items: stretch; }
+.stepper input { flex: 1; text-align: center; font-size: 1.1rem; font-weight: 600; min-width: 0; }
 .step-btn {
   background: var(--bg);
   color: var(--text);
@@ -162,10 +150,13 @@ code { background: var(--bg); padding: 0.1rem 0.3rem; border-radius: 4px; font-s
   padding: 0.55rem 0.6rem;
   min-width: 2.8rem;
   cursor: pointer;
-  transition: border-color 0.15s;
 }
-.step-btn:hover:not(:disabled) { border-color: var(--accent); opacity: 1; }
+.step-btn:hover:not(:disabled) { opacity: 1; }
 .step-btn:active { background: var(--card); }
+.step-btn[data-weight^="-"], .step-btn[data-rep-delta^="-"] { color: var(--danger); border-color: rgba(248, 113, 113, 0.35); }
+.step-btn[data-weight]:not([data-weight^="-"]), .step-btn[data-rep-delta]:not([data-rep-delta^="-"]) { color: var(--accent); border-color: rgba(74, 222, 128, 0.35); }
+.weight-buttons { display: grid; grid-template-columns: repeat(6, 1fr); gap: 0.4rem; margin-top: 0.4rem; }
+.weight-buttons .step-btn { min-width: 0; padding: 0.55rem 0.2rem; font-size: 0.85rem; }
 .sets-list { display: flex; flex-direction: column; gap: 0.4rem; }
 .set-row {
   display: flex;
@@ -175,17 +166,8 @@ code { background: var(--bg); padding: 0.1rem 0.3rem; border-radius: 4px; font-s
   border-radius: 6px;
   padding: 0.45rem 0.55rem;
 }
-.set-label {
-  font-size: 0.82rem;
-  color: var(--muted);
-  flex: 0 0 4rem;
-}
-.rep-count {
-  flex: 1;
-  text-align: center;
-  font-size: 1.1rem;
-  font-weight: 600;
-}
+.set-label { font-size: 0.82rem; color: var(--muted); flex: 0 0 4rem; }
+.rep-count { flex: 1; text-align: center; font-size: 1.1rem; font-weight: 600; }
 .set-row .step-btn { min-width: 2.4rem; padding: 0.45rem 0.5rem; }
 .set-row .remove-btn {
   background: transparent;
@@ -197,25 +179,100 @@ code { background: var(--bg); padding: 0.1rem 0.3rem; border-radius: 4px; font-s
   border-radius: 8px;
 }
 .set-row .remove-btn:hover { border-color: var(--danger); }
-html { color-scheme: dark; }
-.step-btn[data-weight^="-"],
-.step-btn[data-rep-delta^="-"] { color: var(--danger); border-color: rgba(248, 113, 113, 0.35); }
-.step-btn[data-weight]:not([data-weight^="-"]),
-.step-btn[data-rep-delta]:not([data-rep-delta^="-"]) { color: var(--accent); border-color: rgba(74, 222, 128, 0.35); }
-.weight-buttons {
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: 0.4rem;
-  margin-top: 0.4rem;
+.form-row.exercise-row { grid-template-columns: 1fr 90px; gap: 0.6rem; align-items: stretch; }
+.illustration-wrap {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.4rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
 }
-.weight-buttons .step-btn {
-  min-width: 0;
-  padding: 0.55rem 0.2rem;
-  font-size: 0.85rem;
-}
+.illustration-wrap svg { width: 100%; height: auto; max-height: 100px; color: var(--text); }
+.muscle-label { font-size: 0.7rem; color: var(--accent); text-align: center; line-height: 1.2; min-height: 1.2em; font-weight: 500; }
 @media (max-width: 480px) {
+  .form-row.exercise-row { grid-template-columns: 1fr; }
+  .illustration-wrap { flex-direction: row; padding: 0.5rem; gap: 0.6rem; min-height: 90px; }
+  .illustration-wrap svg { width: auto; max-width: 80px; max-height: 80px; }
+  .muscle-label { font-size: 0.85rem; text-align: left; align-self: center; }
   .step-btn { min-width: 2.3rem; padding: 0.45rem 0.4rem; font-size: 0.9rem; }
   .set-label { flex: 0 0 3.5rem; font-size: 0.78rem; }
+}
+.tabs {
+  display: flex;
+  gap: 0;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+}
+.tab {
+  background: transparent;
+  color: var(--muted);
+  border: none;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  padding: 0.7rem 1.1rem;
+  font-weight: 500;
+  cursor: pointer;
+  font-size: 0.95rem;
+}
+.tab.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+.tab-content.hidden { display: none; }
+.wiki-search {
+  width: 100%;
+  margin-bottom: 1rem;
+}
+.wiki-item {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1rem;
+  margin-bottom: 0.75rem;
+  display: grid;
+  grid-template-columns: 100px 1fr;
+  gap: 1rem;
+  align-items: start;
+}
+.wiki-illustration {
+  background: var(--bg);
+  border-radius: 8px;
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 1;
+}
+.wiki-illustration svg { width: 100%; height: auto; max-height: 90px; color: var(--text); }
+.wiki-content h3 { font-size: 1rem; margin-bottom: 0.4rem; font-weight: 600; }
+.wiki-content h3 .alt { color: var(--muted); font-weight: 400; font-size: 0.85em; }
+.wiki-content .tags { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-bottom: 0.6rem; }
+.wiki-content .tag {
+  background: rgba(74, 222, 128, 0.1);
+  color: var(--accent);
+  border: 1px solid rgba(74, 222, 128, 0.4);
+  padding: 0.1rem 0.5rem;
+  border-radius: 6px;
+  font-size: 0.72rem;
+  font-weight: 500;
+}
+.wiki-content p { font-size: 0.88rem; margin-bottom: 0.5rem; }
+.wiki-content .tip {
+  font-size: 0.85rem;
+  color: var(--muted);
+  border-left: 2px solid var(--accent);
+  padding-left: 0.6rem;
+  margin-top: 0.5rem;
+}
+.wiki-content .tip strong { color: var(--accent); }
+@media (max-width: 480px) {
+  .wiki-item { grid-template-columns: 1fr; }
+  .wiki-illustration { aspect-ratio: auto; min-height: 110px; }
+  .wiki-illustration svg { max-height: 100px; }
 }
 </style>
 </head>
@@ -240,87 +297,84 @@ Avaa <code>index.html</code> ja korvaa <code>firebaseConfig</code>-objekti omill
   </div>
 
   <div id="appArea" style="display: none;">
-    <div class="card">
-      <details>
-        <summary style="color: var(--muted); font-size: 0.9rem;">API-asetukset</summary>
-        <div style="margin-top: 0.75rem;">
-          <label for="apikey">Gemini API-avain</label>
-          <input type="password" id="apikey" placeholder="AIza..." style="width: 100%;">
-          <button id="saveKey" class="secondary" style="margin-top: 0.5rem;">Tallenna avain</button>
-          <div class="hint">Tallennetaan vain selaimen localStorageen. Ei koskaan lähde Firestoreen tai repositorioon.</div>
+    <nav class="tabs">
+      <button class="tab active" data-tab="train">Treenaa</button>
+      <button class="tab" data-tab="wiki">Liikewiki</button>
+    </nav>
+
+    <div class="tab-content" id="tabTrain">
+      <div class="card">
+        <details>
+          <summary style="color: var(--muted); font-size: 0.9rem; cursor: pointer;">API-asetukset</summary>
+          <div style="margin-top: 0.75rem;">
+            <label for="apikey">Gemini API-avain</label>
+            <input type="password" id="apikey" placeholder="AIza..." style="width: 100%;">
+            <button id="saveKey" class="secondary" style="margin-top: 0.5rem;">Tallenna avain</button>
+            <div class="hint">Tallennetaan vain selaimen localStorageen.</div>
+          </div>
+        </details>
+      </div>
+
+      <div class="card">
+        <h2>Uusi harjoitus</h2>
+        <div class="form-row">
+          <label for="sessionDate">Päivämäärä</label>
+          <input type="date" id="sessionDate">
         </div>
-      </details>
-    </div>
-
-    <div class="card">
-      <h2>Uusi harjoitus</h2>
-      <div class="form-row">
-        <label for="sessionDate">Päivämäärä</label>
-        <input type="date" id="sessionDate">
-      </div>
-      <div class="form-row">
-        <label for="exerciseName">Liike</label>
-        <input type="text" id="exerciseName" list="exerciseList" placeholder="Aloita kirjoittaminen tai valitse listalta…" autocomplete="off">
-        <datalist id="exerciseList">
-          <option value="Penkkipunnerrus / Bench press"></option>
-          <option value="Vinopenkkipunnerrus / Incline bench press"></option>
-          <option value="Pystypunnerrus / Overhead press"></option>
-          <option value="Sivuvipunosto / Lateral raise"></option>
-          <option value="Etuvipunosto / Front raise"></option>
-          <option value="Hauiskääntö / Bicep curl"></option>
-          <option value="Ojentajan punnerrus / Tricep extension"></option>
-          <option value="Kyykky / Squat"></option>
-          <option value="Etukyykky / Front squat"></option>
-          <option value="Maastaveto / Deadlift"></option>
-          <option value="Romanialainen maastaveto / Romanian deadlift"></option>
-          <option value="Reisiojennus / Leg extension"></option>
-          <option value="Reisikoukistus / Leg curl"></option>
-          <option value="Pohjepunnerrus / Calf raise"></option>
-          <option value="Pakaranojennus / Hip thrust"></option>
-          <option value="Leuanveto / Pull-up"></option>
-          <option value="Dippi / Dip"></option>
-          <option value="Kulmasoutu / Barbell row"></option>
-          <option value="Ylätalja / Lat pulldown"></option>
-          <option value="Alatalja / Cable row"></option>
-          <option value="Lankku / Plank"></option>
-          <option value="Vatsarutistus / Crunch"></option>
-          <option value="Etunoja / Push-up"></option>
-          <option value="Selän ojennus / Back extension"></option>
-        </datalist>
-      </div>
-
-      <div class="form-row">
-        <label>Paino (kg)</label>
-        <input type="number" id="exerciseWeight" min="0" step="0.5" value="0" inputmode="decimal">
-        <div class="weight-buttons">
-          <button type="button" class="step-btn" data-weight="-5">−5</button>
-          <button type="button" class="step-btn" data-weight="-1">−1</button>
-          <button type="button" class="step-btn" data-weight="-0.5">−0.5</button>
-          <button type="button" class="step-btn" data-weight="0.5">+0.5</button>
-          <button type="button" class="step-btn" data-weight="1">+1</button>
-          <button type="button" class="step-btn" data-weight="5">+5</button>
+        <div class="form-row exercise-row">
+          <div>
+            <label for="exerciseName">Liike</label>
+            <input type="text" id="exerciseName" list="exerciseList" placeholder="Aloita kirjoittaminen…" autocomplete="off" style="width: 100%;">
+            <datalist id="exerciseList"></datalist>
+          </div>
+          <div class="illustration-wrap" id="illustrationWrap">
+            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <circle cx="50" cy="22" r="8" fill="none" stroke="currentColor" stroke-width="2"/>
+              <line x1="50" y1="30" x2="50" y2="60" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+              <line x1="50" y1="38" x2="32" y2="50" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+              <line x1="50" y1="38" x2="68" y2="50" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+              <line x1="50" y1="60" x2="38" y2="85" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+              <line x1="50" y1="60" x2="62" y2="85" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+            </svg>
+            <div class="muscle-label" id="muscleLabel"></div>
+          </div>
         </div>
+        <div class="form-row">
+          <label>Paino (kg)</label>
+          <input type="number" id="exerciseWeight" min="0" step="0.5" value="0" inputmode="decimal">
+          <div class="weight-buttons">
+            <button type="button" class="step-btn" data-weight="-5">−5</button>
+            <button type="button" class="step-btn" data-weight="-1">−1</button>
+            <button type="button" class="step-btn" data-weight="-0.5">−0.5</button>
+            <button type="button" class="step-btn" data-weight="0.5">+0.5</button>
+            <button type="button" class="step-btn" data-weight="1">+1</button>
+            <button type="button" class="step-btn" data-weight="5">+5</button>
+          </div>
+        </div>
+        <div class="form-row">
+          <label>Sarjat × Toistot</label>
+          <div id="setsList" class="sets-list"></div>
+          <button type="button" id="addSet" class="secondary" style="width: 100%; margin-top: 0.4rem;">+ Lisää sarja</button>
+        </div>
+        <button type="button" id="addExercise" class="secondary" style="width: 100%; margin-top: 0.25rem;">Lisää liike sessioon</button>
+        <div class="exercises-list" id="exercisesList" style="margin-top: 1rem;"></div>
+        <button id="submitSession" style="width: 100%;">Tallenna &amp; pyydä suositus</button>
       </div>
 
-      <div class="form-row">
-        <label>Sarjat × Toistot</label>
-        <div id="setsList" class="sets-list"></div>
-        <button type="button" id="addSet" class="secondary" style="width: 100%; margin-top: 0.4rem;">+ Lisää sarja</button>
+      <div class="card" id="responseCard" style="display: none;">
+        <h2>AI-suositus</h2>
+        <div id="response"></div>
       </div>
 
-      <button type="button" id="addExercise" class="secondary" style="width: 100%; margin-top: 0.25rem;">Lisää liike sessioon</button>
-      <div class="exercises-list" id="exercisesList"></div>
-      <button id="submitSession" style="width: 100%;">Tallenna &amp; pyydä suositus</button>
+      <div class="card">
+        <h2>Historia</h2>
+        <div id="history"></div>
+      </div>
     </div>
 
-    <div class="card" id="responseCard" style="display: none;">
-      <h2>AI-suositus</h2>
-      <div id="response"></div>
-    </div>
-
-    <div class="card">
-      <h2>Historia</h2>
-      <div id="history"></div>
+    <div class="tab-content hidden" id="tabWiki">
+      <input type="text" id="wikiSearch" class="wiki-search" placeholder="Suodata liikkeitä…" autocomplete="off">
+      <div id="wikiList"></div>
     </div>
   </div>
 </div>
@@ -345,6 +399,348 @@ const firebaseConfig = {
 const GEMINI_MODEL = 'gemini-2.5-flash';
 const $ = (id) => document.getElementById(id);
 
+const muscleNames = {
+  chest: 'Rinta',
+  back: 'Selkä',
+  shoulders: 'Olkapäät',
+  arms: 'Kädet',
+  core: 'Keskivartalo',
+  legs: 'Jalat',
+  calves: 'Pohkeet',
+};
+
+const exerciseDb = [
+  {
+    key: 'penkkipunnerrus',
+    aliases: ['penkki', 'bench', 'bench press'],
+    name: 'Penkkipunnerrus',
+    nameEn: 'Bench press',
+    muscles: ['chest', 'shoulders', 'arms'],
+    description: 'Makuulla penkillä, jalat tukevasti lattiassa. Tartu tankoon hieman hartioita leveämmältä otteella. Laske tanko hallitusti ylärintaan ja työnnä takaisin ylös käsivarret suoraksi.',
+    tips: 'Pidä lavat puristettuina yhteen ja lantio kiinni penkissä koko liikkeen ajan. Pariudu hyvin kulmasoudun kanssa (vastalihaksille).',
+    illustration: `<svg viewBox="0 0 100 70" xmlns="http://www.w3.org/2000/svg"><rect x="14" y="42" width="72" height="4" fill="#666"/><line x1="22" y1="46" x2="22" y2="62" stroke="#666" stroke-width="3"/><line x1="78" y1="46" x2="78" y2="62" stroke="#666" stroke-width="3"/><line x1="22" y1="40" x2="78" y2="40" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><circle cx="22" cy="38" r="4" fill="none" stroke="currentColor" stroke-width="2"/><line x1="50" y1="40" x2="50" y2="22" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="50" y1="22" x2="42" y2="14" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="50" y1="22" x2="58" y2="14" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="30" y1="11" x2="70" y2="11" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><rect x="26" y="6" width="4" height="11" fill="currentColor"/><rect x="70" y="6" width="4" height="11" fill="currentColor"/></svg>`,
+  },
+  {
+    key: 'vinopenkkipunnerrus',
+    aliases: ['vinopenkki', 'incline', 'incline bench'],
+    name: 'Vinopenkkipunnerrus',
+    nameEn: 'Incline bench press',
+    muscles: ['chest', 'shoulders', 'arms'],
+    description: 'Kuten penkkipunnerrus, mutta penkki vinossa 15–30°. Tanko lasketaan ylärintaan. Korostaa rinnan yläosaa.',
+    tips: 'Älä aseta vinoa liian jyrkäksi (yli 45° muuttuu pystypunnerrukseksi). Kevennä painoa 10–15 % verrattuna tasapenkkiin.',
+    illustration: `<svg viewBox="0 0 100 70" xmlns="http://www.w3.org/2000/svg"><line x1="14" y1="58" x2="86" y2="28" stroke="#666" stroke-width="4" stroke-linecap="round"/><line x1="20" y1="58" x2="20" y2="68" stroke="#666" stroke-width="3"/><line x1="80" y1="32" x2="80" y2="42" stroke="#666" stroke-width="3"/><line x1="28" y1="52" x2="72" y2="30" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><circle cx="74" cy="29" r="4" fill="none" stroke="currentColor" stroke-width="2"/><line x1="50" y1="42" x2="48" y2="22" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="48" y1="22" x2="40" y2="16" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="48" y1="22" x2="56" y2="16" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="30" y1="14" x2="66" y2="14" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><rect x="26" y="9" width="4" height="11" fill="currentColor"/><rect x="66" y="9" width="4" height="11" fill="currentColor"/></svg>`,
+  },
+  {
+    key: 'pystypunnerrus',
+    aliases: ['pystypunner', 'overhead', 'ohp', 'military press', 'olkapunner'],
+    name: 'Pystypunnerrus',
+    nameEn: 'Overhead press',
+    muscles: ['shoulders', 'arms', 'core'],
+    description: 'Seisten tanko olkapäiden tasolla, jalat hartioiden leveydellä. Työnnä tanko suoraan ylös pään yli kunnes kädet ovat suorina. Laske hallitusti takaisin.',
+    tips: 'Pidä keskivartalo tiukkana ja pakarat napakat — tämä estää selän taipumisen. Älä tee samana päivänä raskaan penkin kanssa, olkanivel rasittuu.',
+    illustration: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="38" r="5" fill="none" stroke="currentColor" stroke-width="2"/><line x1="50" y1="43" x2="50" y2="72" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><line x1="50" y1="48" x2="38" y2="35" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="50" y1="48" x2="62" y2="35" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="38" y1="35" x2="38" y2="22" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="62" y1="35" x2="62" y2="22" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="22" y1="20" x2="78" y2="20" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><rect x="18" y="14" width="4" height="12" fill="currentColor"/><rect x="78" y="14" width="4" height="12" fill="currentColor"/><line x1="50" y1="72" x2="42" y2="92" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><line x1="50" y1="72" x2="58" y2="92" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>`,
+  },
+  {
+    key: 'sivuvipunosto',
+    aliases: ['sivuvip', 'lateral', 'lateral raise'],
+    name: 'Sivuvipunosto',
+    nameEn: 'Lateral raise',
+    muscles: ['shoulders'],
+    description: 'Seisten käsipainot vartalon vieressä. Nosta kädet sivuilla ylös hartioiden korkeudelle. Laske rauhallisesti.',
+    tips: 'Pidä kyynärpäät hieman koukussa, älä lukitse niitä. Jos heilahtelet, paino on liian iso.',
+    illustration: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="22" r="5" fill="none" stroke="currentColor" stroke-width="2"/><line x1="50" y1="27" x2="50" y2="62" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><line x1="50" y1="35" x2="22" y2="38" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="50" y1="35" x2="78" y2="38" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><rect x="14" y="34" width="10" height="10" fill="currentColor" rx="1"/><rect x="76" y="34" width="10" height="10" fill="currentColor" rx="1"/><line x1="50" y1="62" x2="42" y2="90" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><line x1="50" y1="62" x2="58" y2="90" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>`,
+  },
+  {
+    key: 'etuvipunosto',
+    aliases: ['etuvip', 'front raise'],
+    name: 'Etuvipunosto',
+    nameEn: 'Front raise',
+    muscles: ['shoulders'],
+    description: 'Seisten käsipainot reisien edessä. Nosta toinen käsi suoraksi eteen hartiakorkeudelle, vuorottele.',
+    tips: 'Liike kuormittaa olkapään etuosaa, joka jo aktivoituu penkkipunnerruksessa — älä siis ylitee tätä. Kerran viikossa riittää.',
+    illustration: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="22" r="5" fill="none" stroke="currentColor" stroke-width="2"/><line x1="50" y1="27" x2="50" y2="62" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><line x1="50" y1="33" x2="78" y2="33" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><rect x="78" y="29" width="10" height="10" fill="currentColor" rx="1"/><line x1="50" y1="40" x2="40" y2="58" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><rect x="35" y="58" width="10" height="10" fill="currentColor" rx="1"/><line x1="50" y1="62" x2="42" y2="90" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><line x1="50" y1="62" x2="58" y2="90" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>`,
+  },
+  {
+    key: 'hauiskaanto',
+    aliases: ['hauis', 'bicep', 'bicep curl', 'curl', 'käsipainokääntö'],
+    name: 'Hauiskääntö',
+    nameEn: 'Bicep curl',
+    muscles: ['arms'],
+    description: 'Seisten käsipainot tai tanko reisien edessä, kämmenet eteenpäin. Koukista kyynärpäät ja nosta paino olkapäille. Laske hallitusti.',
+    tips: 'Kyynärpäät pysyvät kyljessä — jos ne lähtevät eteen, käytät hartioita. Vältä kehon heilauttamista.',
+    illustration: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="22" r="5" fill="none" stroke="currentColor" stroke-width="2"/><line x1="50" y1="27" x2="50" y2="62" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><line x1="50" y1="35" x2="40" y2="50" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="50" y1="35" x2="60" y2="50" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="40" y1="50" x2="46" y2="32" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="60" y1="50" x2="54" y2="32" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><rect x="40" y="26" width="12" height="8" fill="currentColor" rx="1"/><rect x="48" y="26" width="12" height="8" fill="currentColor" rx="1"/><line x1="50" y1="62" x2="42" y2="90" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><line x1="50" y1="62" x2="58" y2="90" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>`,
+  },
+  {
+    key: 'vasarakaanto',
+    aliases: ['vasarakääntö', 'hammer', 'hammer curl'],
+    name: 'Vasarakääntö',
+    nameEn: 'Hammer curl',
+    muscles: ['arms'],
+    description: 'Sama kuin hauiskääntö, mutta peukalot ylöspäin (neutraali ote). Kuormittaa hauista ja erityisesti kyynärvarren brakialista.',
+    tips: 'Hyvä vaihtelu hauiskäännölle. Käytä samalla painolla tai hieman raskaammalla. Pidä otetta vakaana, älä rotatoi rannetta.',
+    illustration: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="22" r="5" fill="none" stroke="currentColor" stroke-width="2"/><line x1="50" y1="27" x2="50" y2="62" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><line x1="50" y1="35" x2="40" y2="50" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="50" y1="35" x2="60" y2="50" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="40" y1="50" x2="42" y2="32" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="60" y1="50" x2="58" y2="32" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><rect x="38" y="28" width="8" height="14" fill="currentColor" rx="1"/><rect x="54" y="28" width="8" height="14" fill="currentColor" rx="1"/><line x1="50" y1="62" x2="42" y2="90" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><line x1="50" y1="62" x2="58" y2="90" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>`,
+  },
+  {
+    key: 'ojentajan',
+    aliases: ['ojent', 'tricep', 'tricep extension', 'french press'],
+    name: 'Ojentajan punnerrus',
+    nameEn: 'Tricep extension',
+    muscles: ['arms'],
+    description: 'Käsipaino tai tanko pään takana, kyynärpäät pystyssä. Ojenna kädet suoriksi yläasentoon ja palauta hallitusti.',
+    tips: 'Pidä kyynärpäät paikallaan, vain kyynärvarsi liikkuu. Hyvä kombo penkkipunnerruksen jälkeen.',
+    illustration: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="32" r="5" fill="none" stroke="currentColor" stroke-width="2"/><line x1="50" y1="37" x2="50" y2="68" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><line x1="50" y1="42" x2="42" y2="22" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="50" y1="42" x2="58" y2="22" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="42" y1="22" x2="42" y2="14" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="58" y1="22" x2="58" y2="14" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="36" y1="12" x2="64" y2="12" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><rect x="32" y="7" width="4" height="10" fill="currentColor"/><rect x="64" y="7" width="4" height="10" fill="currentColor"/><line x1="50" y1="68" x2="42" y2="92" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><line x1="50" y1="68" x2="58" y2="92" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>`,
+  },
+  {
+    key: 'kyykky',
+    aliases: ['squat', 'back squat', 'takakyykky'],
+    name: 'Kyykky',
+    nameEn: 'Back squat',
+    muscles: ['legs', 'core'],
+    description: 'Tanko niskan päällä lapojen tasolla, jalat hartioiden leveydellä. Kyykisty alas pitäen rinta ylhäällä, kunnes reidet vähintään ovat vaakatasossa. Nouse takaisin ylös.',
+    tips: 'Polvet seuraavat varpaiden suuntaa, älä päästä polvia yhteen. Hengitä sisään yläasennossa, pidä happi alas mennessä.',
+    illustration: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><line x1="20" y1="22" x2="80" y2="22" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><rect x="14" y="14" width="6" height="16" fill="currentColor"/><rect x="80" y="14" width="6" height="16" fill="currentColor"/><circle cx="50" cy="20" r="5" fill="none" stroke="currentColor" stroke-width="2"/><line x1="50" y1="25" x2="46" y2="42" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><line x1="40" y1="22" x2="46" y2="42" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="60" y1="22" x2="54" y2="42" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="46" y1="42" x2="32" y2="58" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><line x1="46" y1="42" x2="60" y2="58" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><line x1="32" y1="58" x2="32" y2="88" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><line x1="60" y1="58" x2="60" y2="88" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><line x1="26" y1="90" x2="40" y2="90" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="54" y1="90" x2="68" y2="90" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>`,
+  },
+  {
+    key: 'etukyykky',
+    aliases: ['front squat'],
+    name: 'Etukyykky',
+    nameEn: 'Front squat',
+    muscles: ['legs', 'core'],
+    description: 'Tanko etupuolella olkapäiden päällä, kyynärpäät pystyssä. Kyykisty pysyen pystymmässä asennossa kuin takakyykyssä.',
+    tips: 'Vaatii ranteen ja olkapään liikkuvuutta. Korostaa etureisiä takakyykkyä enemmän. Aloita kevyemmillä painoilla.',
+    illustration: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><line x1="20" y1="32" x2="80" y2="32" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><rect x="14" y="24" width="6" height="16" fill="currentColor"/><rect x="80" y="24" width="6" height="16" fill="currentColor"/><circle cx="50" cy="22" r="5" fill="none" stroke="currentColor" stroke-width="2"/><line x1="50" y1="27" x2="50" y2="42" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><line x1="50" y1="32" x2="40" y2="22" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="50" y1="32" x2="60" y2="22" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="50" y1="42" x2="36" y2="58" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><line x1="50" y1="42" x2="64" y2="58" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><line x1="36" y1="58" x2="36" y2="88" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><line x1="64" y1="58" x2="64" y2="88" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><line x1="30" y1="90" x2="44" y2="90" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="58" y1="90" x2="72" y2="90" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>`,
+  },
+  {
+    key: 'goblet',
+    aliases: ['goblet squat'],
+    name: 'Goblet squat',
+    nameEn: 'Goblet squat',
+    muscles: ['legs', 'core'],
+    description: 'Pidä käsipainoa molemmin käsin pystyssä rinnan edessä. Kyykisty syvälle ja nouse. Hyvä kyykyn opettelija.',
+    tips: 'Käsipaino auttaa pitämään ylävartalon pystyssä. Paino kyykky-välineenä rajaa kuorman, joten loistava lämmittely tai aloittelijalle.',
+    illustration: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="20" r="5" fill="none" stroke="currentColor" stroke-width="2"/><line x1="50" y1="25" x2="48" y2="42" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><rect x="42" y="30" width="16" height="14" fill="currentColor" rx="2"/><line x1="42" y1="32" x2="36" y2="42" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="58" y1="32" x2="64" y2="42" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="48" y1="42" x2="34" y2="58" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><line x1="48" y1="42" x2="62" y2="58" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><line x1="34" y1="58" x2="34" y2="88" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><line x1="62" y1="58" x2="62" y2="88" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><line x1="28" y1="90" x2="42" y2="90" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="56" y1="90" x2="70" y2="90" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>`,
+  },
+  {
+    key: 'bulgarialainen',
+    aliases: ['bulgarian', 'bulgarian split squat', 'split squat'],
+    name: 'Bulgarialainen kyykky',
+    nameEn: 'Bulgarian split squat',
+    muscles: ['legs', 'core'],
+    description: 'Toinen jalka taakse penkin päällä, etujalalla kyykky alas. Hyvä yksipuolinen liike, korjaa eroja jalkojen välillä.',
+    tips: 'Etujalan polvi linjassa varpaiden kanssa. Käsipainot tai kettlebellit lisäävät kuormitusta. Aloita kevyt — tasapaino haasteena.',
+    illustration: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect x="62" y="60" width="30" height="4" fill="#666"/><line x1="68" y1="64" x2="68" y2="80" stroke="#666" stroke-width="2.5"/><line x1="86" y1="64" x2="86" y2="80" stroke="#666" stroke-width="2.5"/><circle cx="40" cy="20" r="5" fill="none" stroke="currentColor" stroke-width="2"/><line x1="40" y1="25" x2="40" y2="50" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><line x1="40" y1="32" x2="30" y2="48" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="40" y1="32" x2="50" y2="48" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><rect x="26" y="46" width="8" height="8" fill="currentColor" rx="1"/><rect x="46" y="46" width="8" height="8" fill="currentColor" rx="1"/><line x1="40" y1="50" x2="34" y2="72" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><line x1="34" y1="72" x2="34" y2="92" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><line x1="40" y1="50" x2="60" y2="58" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><line x1="60" y1="58" x2="76" y2="60" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>`,
+  },
+  {
+    key: 'askelkyykky',
+    aliases: ['lunge', 'askel'],
+    name: 'Askelkyykky',
+    nameEn: 'Lunge',
+    muscles: ['legs', 'core'],
+    description: 'Astu pitkä askel eteen, laske takimmainen polvi lähelle lattiaa. Etujalan polvi noin 90° kulmassa. Nouse ja vaihda jalkaa.',
+    tips: 'Etupolvi varpaiden suunnassa, ei sisään. Käsipainot lisäävät kuormaa. Käveleviä askelkyykkyjä myös pitkällä jonolla.',
+    illustration: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="22" r="5" fill="none" stroke="currentColor" stroke-width="2"/><line x1="50" y1="27" x2="50" y2="50" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><line x1="50" y1="34" x2="40" y2="50" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="50" y1="34" x2="60" y2="50" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><rect x="36" y="48" width="8" height="8" fill="currentColor" rx="1"/><rect x="56" y="48" width="8" height="8" fill="currentColor" rx="1"/><line x1="50" y1="50" x2="32" y2="68" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><line x1="32" y1="68" x2="32" y2="92" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><line x1="50" y1="50" x2="68" y2="76" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><line x1="68" y1="76" x2="76" y2="92" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>`,
+  },
+  {
+    key: 'maastaveto',
+    aliases: ['deadlift', 'maasta'],
+    name: 'Maastaveto',
+    nameEn: 'Deadlift',
+    muscles: ['back', 'legs', 'core'],
+    description: 'Tanko lattialla jalkojen edessä, ote hartioiden levyiseltä. Pidä selkä neutraalina, vedä tanko jalkoja pitkin ylös pysähtyen pystyasentoon.',
+    tips: 'Selkä ei saa pyöristyä. Aloita kevyellä painolla ja keskity tekniikkaan. Yksi viikon raskaista liikkeistä — tarvitsee palautumista.',
+    illustration: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><line x1="10" y1="80" x2="90" y2="80" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><rect x="6" y="73" width="6" height="14" fill="currentColor"/><rect x="88" y="73" width="6" height="14" fill="currentColor"/><circle cx="40" cy="22" r="5" fill="none" stroke="currentColor" stroke-width="2"/><line x1="40" y1="27" x2="44" y2="50" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><line x1="44" y1="50" x2="50" y2="62" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><line x1="44" y1="40" x2="38" y2="60" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="38" y1="60" x2="40" y2="80" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="44" y1="40" x2="56" y2="60" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="56" y1="60" x2="58" y2="80" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="50" y1="62" x2="58" y2="92" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><line x1="50" y1="62" x2="42" y2="92" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>`,
+  },
+  {
+    key: 'romaniandeadlift',
+    aliases: ['romanian', 'romanian deadlift', 'rdl', 'romanialainen', 'maasta jaloilla'],
+    name: 'Romanialainen maastaveto',
+    nameEn: 'Romanian deadlift',
+    muscles: ['legs', 'back'],
+    description: 'Seisten tanko reisillä, pieni polvitaivutus. Kallista lantio taakse ja laske tanko reisiä pitkin sääriin asti. Tunne venytys takareisissä, palaa ylös.',
+    tips: 'Liike tulee lantiolta, ei polvista. Pidä tanko aivan kiinni jaloissa. Korostaa takareittä ja pakaroita.',
+    illustration: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="14" r="5" fill="none" stroke="currentColor" stroke-width="2"/><line x1="50" y1="19" x2="56" y2="48" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><line x1="56" y1="48" x2="50" y2="72" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><line x1="56" y1="40" x2="50" y2="58" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="56" y1="40" x2="62" y2="58" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="38" y1="58" x2="74" y2="58" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><rect x="32" y="52" width="6" height="14" fill="currentColor"/><rect x="74" y="52" width="6" height="14" fill="currentColor"/><line x1="50" y1="72" x2="46" y2="92" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><line x1="50" y1="72" x2="54" y2="92" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>`,
+  },
+  {
+    key: 'reisiojennus',
+    aliases: ['leg ext', 'leg extension', 'reisiext'],
+    name: 'Reisiojennus',
+    nameEn: 'Leg extension',
+    muscles: ['legs'],
+    description: 'Istu reisiojennuskoneessa, säärten alaosa kiinni tyynyssä. Ojenna polvet täysin suoriksi ja palaa hallitusti.',
+    tips: 'Eristää etureidet. Hyvä apuliike kyykyn jälkeen. Älä paukuta päätyihin — hallittu liike tehoaa enemmän.',
+    illustration: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect x="14" y="42" width="40" height="20" fill="#666" rx="3"/><rect x="22" y="62" width="6" height="20" fill="#666"/><rect x="40" y="62" width="6" height="20" fill="#666"/><circle cx="32" cy="34" r="5" fill="none" stroke="currentColor" stroke-width="2"/><line x1="32" y1="39" x2="42" y2="50" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><line x1="42" y1="50" x2="44" y2="60" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><line x1="44" y1="60" x2="80" y2="48" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><circle cx="80" cy="48" r="6" fill="none" stroke="#666" stroke-width="2"/></svg>`,
+  },
+  {
+    key: 'reisikoukistus',
+    aliases: ['leg curl', 'reisikoukku'],
+    name: 'Reisikoukistus',
+    nameEn: 'Leg curl',
+    muscles: ['legs'],
+    description: 'Vatsallaan reisikoukistuskoneessa, säärten yläosa kiinni tyynyssä. Koukista polvet vetäen tyynyä pakaroita kohti.',
+    tips: 'Eristää takareidet. Tärkeää reisien kokonaisuudelle, koska kyykyssä korostuu etureisi. Älä nosta lantiota irti penkistä.',
+    illustration: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect x="14" y="58" width="60" height="14" fill="#666" rx="3"/><rect x="22" y="72" width="6" height="20" fill="#666"/><rect x="60" y="72" width="6" height="20" fill="#666"/><circle cx="22" cy="50" r="5" fill="none" stroke="currentColor" stroke-width="2"/><line x1="22" y1="55" x2="60" y2="55" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><line x1="60" y1="55" x2="78" y2="40" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><circle cx="80" cy="38" r="6" fill="none" stroke="#666" stroke-width="2"/></svg>`,
+  },
+  {
+    key: 'jalkaprassi',
+    aliases: ['jalkaprässi', 'leg press'],
+    name: 'Jalkaprässi',
+    nameEn: 'Leg press',
+    muscles: ['legs', 'core'],
+    description: 'Istu prässissä selkä tukea vasten. Aseta jalat alustalle hartioiden leveydeltä. Työnnä alustaa pois jalkoja ojentamalla, palaa hallitusti.',
+    tips: 'Älä lukitse polvia ojennetussa asennossa. Jalkojen sijainti vaikuttaa: korkealla painottuu pakaroihin, matalalla etureisiin.',
+    illustration: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><line x1="14" y1="80" x2="48" y2="58" stroke="#666" stroke-width="4" stroke-linecap="round"/><rect x="44" y="20" width="42" height="40" fill="#666" rx="2"/><circle cx="22" cy="68" r="5" fill="none" stroke="currentColor" stroke-width="2"/><line x1="22" y1="73" x2="38" y2="80" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><line x1="38" y1="80" x2="50" y2="60" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><line x1="50" y1="60" x2="46" y2="42" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><line x1="38" y1="80" x2="44" y2="70" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>`,
+  },
+  {
+    key: 'pohjepunnerrus',
+    aliases: ['pohje', 'calf', 'calf raise'],
+    name: 'Pohjepunnerrus',
+    nameEn: 'Calf raise',
+    muscles: ['calves'],
+    description: 'Seisten varpaiden päällä alustalla tai porrasaskelmalla, kantapäät alaspäin. Nouse korkealle varpaille ja laske hitaasti.',
+    tips: 'Käytä täyttä liikerataa: alas hyvä venytys, ylös täysi puristus. Voi tehdä yhdellä jalalla kuormitusta varten.',
+    illustration: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect x="40" y="84" width="20" height="6" fill="#666"/><circle cx="50" cy="22" r="5" fill="none" stroke="currentColor" stroke-width="2"/><line x1="50" y1="27" x2="50" y2="62" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><line x1="50" y1="34" x2="38" y2="48" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="50" y1="34" x2="62" y2="48" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><rect x="32" y="46" width="8" height="8" fill="currentColor" rx="1"/><rect x="60" y="46" width="8" height="8" fill="currentColor" rx="1"/><line x1="50" y1="62" x2="44" y2="84" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><line x1="50" y1="62" x2="56" y2="84" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><line x1="40" y1="84" x2="50" y2="78" stroke="currentColor" stroke-width="2.5"/><line x1="60" y1="84" x2="50" y2="78" stroke="currentColor" stroke-width="2.5"/></svg>`,
+  },
+  {
+    key: 'pakaranojennus',
+    aliases: ['pakaran', 'hip thrust'],
+    name: 'Pakaranojennus',
+    nameEn: 'Hip thrust',
+    muscles: ['legs'],
+    description: 'Lapaluut tukea vasten penkillä, jalat lattiassa polvet 90°. Tanko lantion päällä. Työnnä lantio ylös niin että vartalo on suorassa, purista pakarat.',
+    tips: 'Pakaraliike numero 1. Pidä leuka rinnassa, ei taivuta selkää. Käytä tankoon pehmusteita lantion suojaksi.',
+    illustration: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect x="6" y="22" width="20" height="22" fill="#666" rx="2"/><line x1="20" y1="56" x2="60" y2="56" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><circle cx="20" cy="44" r="5" fill="none" stroke="currentColor" stroke-width="2"/><line x1="60" y1="56" x2="68" y2="84" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><line x1="68" y1="84" x2="68" y2="92" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><line x1="22" y1="68" x2="86" y2="68" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><rect x="14" y="62" width="8" height="14" fill="currentColor"/><rect x="86" y="62" width="8" height="14" fill="currentColor"/></svg>`,
+  },
+  {
+    key: 'leuanveto',
+    aliases: ['leuan', 'pull-up', 'pullup', 'chin-up'],
+    name: 'Leuanveto',
+    nameEn: 'Pull-up',
+    muscles: ['back', 'arms'],
+    description: 'Tartu tankoon hartioita leveämmältä, kämmenet eteenpäin. Vedä leuka tangon yli puhtaasti — ilman heilutusta. Laske hallitusti.',
+    tips: 'Aluksi käytä pull-up assist -konetta tai kuminauhoja. Lapaluut alas ja taakse ennen vetoa. Hyvä yhdistää leuanvedon kanssa kombo: pari sarjaa kullakin.',
+    illustration: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><line x1="10" y1="14" x2="90" y2="14" stroke="#666" stroke-width="3"/><line x1="10" y1="14" x2="10" y2="6" stroke="#666" stroke-width="3"/><line x1="90" y1="14" x2="90" y2="6" stroke="#666" stroke-width="3"/><line x1="36" y1="14" x2="42" y2="32" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="64" y1="14" x2="58" y2="32" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><circle cx="50" cy="38" r="5" fill="none" stroke="currentColor" stroke-width="2"/><line x1="50" y1="43" x2="50" y2="72" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><line x1="50" y1="50" x2="42" y2="32" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="50" y1="50" x2="58" y2="32" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="50" y1="72" x2="44" y2="92" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><line x1="50" y1="72" x2="56" y2="92" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>`,
+  },
+  {
+    key: 'dippi',
+    aliases: ['dip', 'dippi'],
+    name: 'Dippi',
+    nameEn: 'Dip',
+    muscles: ['chest', 'arms'],
+    description: 'Tukeudu kahteen rinnakkaiseen tankoon kädet suoraksi. Laske vartalo alas koukistaen kyynärpäät, kunnes olkavarret ovat suunnilleen vaakatasossa. Punnerra ylös.',
+    tips: 'Eteen kallistuminen kuormittaa rintaa, pystyssä pysyminen ojentajia. Alkuun assist-koneella tai kuminauhalla.',
+    illustration: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><line x1="20" y1="32" x2="80" y2="32" stroke="#666" stroke-width="3"/><line x1="22" y1="32" x2="22" y2="80" stroke="#666" stroke-width="3"/><line x1="78" y1="32" x2="78" y2="80" stroke="#666" stroke-width="3"/><circle cx="50" cy="22" r="5" fill="none" stroke="currentColor" stroke-width="2"/><line x1="50" y1="27" x2="46" y2="62" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><line x1="50" y1="32" x2="22" y2="44" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="50" y1="32" x2="78" y2="44" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="22" y1="44" x2="22" y2="32" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="78" y1="44" x2="78" y2="32" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="46" y1="62" x2="40" y2="86" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><line x1="46" y1="62" x2="52" y2="86" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>`,
+  },
+  {
+    key: 'kulmasoutu',
+    aliases: ['kulma', 'barbell row', 'bent-over row', 'bent over row'],
+    name: 'Kulmasoutu',
+    nameEn: 'Barbell row',
+    muscles: ['back', 'arms'],
+    description: 'Seisten kallistuneena eteen ~45°, polvet hieman koukussa. Tanko hartioiden leveydeltä. Vedä tanko vatsaan asti, purista lapaluita yhteen.',
+    tips: 'Pidä selkä neutraalina, ei pyöristymistä. Ota hieman keveämpi paino kuin maastavedossa. Erinomainen pari penkkipunnerruksen kanssa.',
+    illustration: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="20" cy="32" r="5" fill="none" stroke="currentColor" stroke-width="2"/><line x1="22" y1="36" x2="62" y2="48" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><line x1="62" y1="48" x2="64" y2="78" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><line x1="64" y1="78" x2="58" y2="92" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><line x1="64" y1="78" x2="72" y2="92" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><line x1="42" y1="44" x2="50" y2="62" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="50" y1="62" x2="44" y2="74" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="14" y1="74" x2="80" y2="74" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><rect x="8" y="68" width="6" height="14" fill="currentColor"/><rect x="80" y="68" width="6" height="14" fill="currentColor"/></svg>`,
+  },
+  {
+    key: 'yhdenkadensoutu',
+    aliases: ['yhden käden', 'one-arm', 'one arm row', 'dumbbell row'],
+    name: 'Yhden käden soutu',
+    nameEn: 'One-arm dumbbell row',
+    muscles: ['back', 'arms'],
+    description: 'Toinen polvi ja samanpuoleinen käsi penkillä. Vapaalla kädellä käsipaino lattiasta. Vedä käsipaino kylkeen, kyynärpää suuntaa kohti taivasta.',
+    tips: 'Yksipuolinen liike, korjaa lihaseroja. Älä kierrä ylävartaloa heilauttamalla — siitä menee tehoa selkälihaksilta.',
+    illustration: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect x="10" y="68" width="50" height="6" fill="#666"/><line x1="14" y1="74" x2="14" y2="92" stroke="#666" stroke-width="3"/><line x1="56" y1="74" x2="56" y2="92" stroke="#666" stroke-width="3"/><circle cx="22" cy="42" r="5" fill="none" stroke="currentColor" stroke-width="2"/><line x1="24" y1="46" x2="60" y2="58" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><line x1="40" y1="52" x2="36" y2="68" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="60" y1="58" x2="76" y2="48" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><rect x="72" y="44" width="10" height="10" fill="currentColor" rx="1"/><line x1="60" y1="58" x2="64" y2="92" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><line x1="60" y1="58" x2="80" y2="80" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>`,
+  },
+  {
+    key: 'ylatalja',
+    aliases: ['ylätalja', 'lat pulldown', 'pulldown', 'talja ylhäältä'],
+    name: 'Ylätalja',
+    nameEn: 'Lat pulldown',
+    muscles: ['back', 'arms'],
+    description: 'Istu taljakoneessa polvet pehmusteen alla. Tartu tankoon hartioita leveämmältä. Vedä tanko ylärintaan, purista lapaluita.',
+    tips: 'Katso vähän ylös, älä taivu eteenpäin. Hyvä korvaaja jos leuanveto ei vielä onnistu.',
+    illustration: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect x="48" y="6" width="4" height="24" fill="#666"/><line x1="30" y1="30" x2="70" y2="30" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><line x1="30" y1="30" x2="34" y2="50" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="70" y1="30" x2="66" y2="50" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><circle cx="50" cy="40" r="5" fill="none" stroke="currentColor" stroke-width="2"/><line x1="50" y1="45" x2="50" y2="74" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><line x1="50" y1="50" x2="34" y2="50" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="50" y1="50" x2="66" y2="50" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="20" y1="84" x2="78" y2="84" stroke="#666" stroke-width="3"/><line x1="50" y1="74" x2="40" y2="84" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><line x1="50" y1="74" x2="60" y2="84" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>`,
+  },
+  {
+    key: 'alatalja',
+    aliases: ['alatalja', 'cable row', 'seated row', 'talja alhaalta'],
+    name: 'Alatalja',
+    nameEn: 'Cable row',
+    muscles: ['back', 'arms'],
+    description: 'Istu taljakoneessa jalat pehmusteita vasten. Tartu kahvaan ja vedä se vatsaan kunnes kyynärpäät ohittavat kylkesi. Pidä rinta ylhäällä.',
+    tips: 'Älä kallista vartaloa edestakaisin saadaksesi enemmän painoa — keskity selkälihaksiin. Kahvan eri muotoja: V-kahva keskittää, leveä levittää.',
+    illustration: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect x="6" y="58" width="14" height="20" fill="#666"/><line x1="20" y1="68" x2="56" y2="62" stroke="#666" stroke-width="2.5" stroke-dasharray="3 2"/><circle cx="56" cy="40" r="5" fill="none" stroke="currentColor" stroke-width="2"/><line x1="56" y1="45" x2="50" y2="78" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><line x1="56" y1="50" x2="40" y2="62" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="56" y1="50" x2="42" y2="62" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="50" y1="78" x2="80" y2="80" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><line x1="80" y1="80" x2="86" y2="86" stroke="#666" stroke-width="3"/><line x1="40" y1="62" x2="32" y2="62" stroke="currentColor" stroke-width="3"/></svg>`,
+  },
+  {
+    key: 'lankku',
+    aliases: ['plank'],
+    name: 'Lankku',
+    nameEn: 'Plank',
+    muscles: ['core'],
+    description: 'Tukeudu kyynärpäille ja varpaille, vartalo suorassa linjassa. Pidä asentoa, jännitä keskivartalo ja pakarat.',
+    tips: 'Älä päästä lantiota laskemaan tai nostamaan. Aloita 20–30 sekunnista, lisää aikaa progressiivisesti. Hyvä lämmittelynä tai treenin lopussa.',
+    illustration: `<svg viewBox="0 0 100 70" xmlns="http://www.w3.org/2000/svg"><line x1="14" y1="62" x2="86" y2="62" stroke="#666" stroke-width="2" stroke-dasharray="3 2"/><circle cx="22" cy="36" r="4" fill="none" stroke="currentColor" stroke-width="2"/><line x1="26" y1="38" x2="78" y2="44" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><line x1="26" y1="42" x2="22" y2="58" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="22" y1="58" x2="32" y2="58" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="78" y1="44" x2="86" y2="58" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>`,
+  },
+  {
+    key: 'vatsarutistus',
+    aliases: ['vatsa', 'crunch', 'vatsalihasliike'],
+    name: 'Vatsarutistus',
+    nameEn: 'Crunch',
+    muscles: ['core'],
+    description: 'Selinmakuulla polvet koukistettuina, kädet ohimoilla. Nosta hartiat irti lattiasta vetäen rintakehää lantiota kohti — älä nosta koko selkää.',
+    tips: 'Liikealue on lyhyt: vain hartiat irti, alaselkä pysyy lattiassa. Älä vedä niskasta. Hidas ja hallittu liike tehoaa parhaiten.',
+    illustration: `<svg viewBox="0 0 100 70" xmlns="http://www.w3.org/2000/svg"><line x1="10" y1="58" x2="90" y2="58" stroke="#666" stroke-width="2" stroke-dasharray="3 2"/><circle cx="22" cy="40" r="4" fill="none" stroke="currentColor" stroke-width="2"/><line x1="26" y1="42" x2="48" y2="48" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><line x1="48" y1="48" x2="64" y2="42" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><line x1="22" y1="42" x2="14" y2="32" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="64" y1="42" x2="80" y2="32" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><line x1="80" y1="32" x2="76" y2="56" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>`,
+  },
+  {
+    key: 'etunoja',
+    aliases: ['etunoja', 'push-up', 'pushup', 'punnerrus'],
+    name: 'Etunoja',
+    nameEn: 'Push-up',
+    muscles: ['chest', 'arms', 'core'],
+    description: 'Lattialla kädet hartioiden alla, vartalo suorassa. Laske rinta lähelle lattiaa koukistaen kyynärpäät, työnnä takaisin ylös.',
+    tips: 'Pidä keskivartalo tiukkana — vatsa ei roiku, lantio ei nouse. Kyynärpäät 45° kulmassa, eivät suoraan sivulle. Loputon variaatio: päädet ylös, päädet alas, yhdellä jalalla.',
+    illustration: `<svg viewBox="0 0 100 70" xmlns="http://www.w3.org/2000/svg"><line x1="10" y1="62" x2="90" y2="62" stroke="#666" stroke-width="2" stroke-dasharray="3 2"/><circle cx="22" cy="34" r="4" fill="none" stroke="currentColor" stroke-width="2"/><line x1="26" y1="36" x2="78" y2="42" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><line x1="32" y1="38" x2="34" y2="58" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="48" y1="40" x2="50" y2="58" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="78" y1="42" x2="86" y2="58" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>`,
+  },
+  {
+    key: 'kahvakuula',
+    aliases: ['kahvakuula', 'kettlebell swing', 'kb swing', 'swing'],
+    name: 'Kahvakuulaheilautus',
+    nameEn: 'Kettlebell swing',
+    muscles: ['legs', 'back', 'core'],
+    description: 'Kahvakuula jalkojen välistä, lantio taakse. Heilauta kuula rintakorkeudelle pakaroiden voimalla — käsivarret seuraavat passiivisesti. Anna painovoiman tuoda kuulan takaisin.',
+    tips: 'Ei kyykky-liike: hartioiden takana lantion ojennus tekee työn. Hyvä kondiopainotteinen liike treenin lopuksi.',
+    illustration: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="22" r="5" fill="none" stroke="currentColor" stroke-width="2"/><line x1="50" y1="27" x2="50" y2="56" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><line x1="50" y1="34" x2="68" y2="42" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="68" y1="42" x2="78" y2="48" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><circle cx="78" cy="56" r="8" fill="currentColor"/><line x1="74" y1="50" x2="78" y2="48" stroke="currentColor" stroke-width="2"/><line x1="82" y1="50" x2="78" y2="48" stroke="currentColor" stroke-width="2"/><line x1="50" y1="56" x2="40" y2="86" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><line x1="50" y1="56" x2="56" y2="86" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>`,
+  },
+];
+
+const defaultIllustration = `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <circle cx="50" cy="22" r="8" fill="none" stroke="currentColor" stroke-width="2"/>
+  <line x1="50" y1="30" x2="50" y2="60" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+  <line x1="50" y1="38" x2="32" y2="50" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+  <line x1="50" y1="38" x2="68" y2="50" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+  <line x1="50" y1="60" x2="38" y2="85" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+  <line x1="50" y1="60" x2="62" y2="85" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+</svg>`;
+
+function findExercise(input) {
+  if (!input) return null;
+  const lower = input.toLowerCase();
+  for (const e of exerciseDb) {
+    const combined = `${e.name} / ${e.nameEn}`.toLowerCase();
+    if (combined === lower || e.name.toLowerCase() === lower || e.nameEn.toLowerCase() === lower) {
+      return e;
+    }
+  }
+  for (const e of exerciseDb) {
+    if (lower.includes(e.name.toLowerCase()) || lower.includes(e.nameEn.toLowerCase())) {
+      return e;
+    }
+    if (e.aliases.some(a => lower.includes(a))) {
+      return e;
+    }
+  }
+  return null;
+}
+
 if (firebaseConfig.apiKey === "PASTE_FIREBASE_API_KEY") {
   $('configError').style.display = 'block';
 } else {
@@ -359,9 +755,69 @@ function startApp() {
 
   let currentUser = null;
   let currentExercises = [];
+  let currentSets = [10];
+
+  $('exerciseList').innerHTML = exerciseDb
+    .map(e => `<option value="${e.name} / ${e.nameEn}"></option>`)
+    .join('');
 
   $('sessionDate').value = new Date().toISOString().slice(0, 10);
   $('apikey').value = localStorage.getItem('gemini_api_key') || '';
+
+  function draftKey() {
+    return 'gym_draft_' + (currentUser ? currentUser.uid : 'anon');
+  }
+  function saveDraft() {
+    if (!currentUser) return;
+    try {
+      localStorage.setItem(draftKey(), JSON.stringify({
+        date: $('sessionDate').value,
+        exercises: currentExercises,
+        pendingExercise: {
+          name: $('exerciseName').value,
+          weight: parseFloat($('exerciseWeight').value) || 0,
+          sets: currentSets,
+        },
+      }));
+    } catch {}
+  }
+  function loadDraft() {
+    if (!currentUser) return;
+    try {
+      const raw = localStorage.getItem(draftKey());
+      if (!raw) return;
+      const draft = JSON.parse(raw);
+      if (draft.date) $('sessionDate').value = draft.date;
+      if (Array.isArray(draft.exercises)) {
+        currentExercises = draft.exercises;
+        renderCurrentExercises();
+      }
+      if (draft.pendingExercise) {
+        $('exerciseName').value = draft.pendingExercise.name || '';
+        const w = draft.pendingExercise.weight;
+        $('exerciseWeight').value = (w !== undefined && w !== null) ? w : '0';
+        const sets = Array.isArray(draft.pendingExercise.sets) ? draft.pendingExercise.sets : [];
+        currentSets = sets.length > 0 ? sets : [10];
+        renderSets();
+        updateExerciseView();
+      }
+    } catch {}
+  }
+  function clearDraft() {
+    if (!currentUser) return;
+    try { localStorage.removeItem(draftKey()); } catch {}
+  }
+
+  function updateExerciseView() {
+    const ex = findExercise($('exerciseName').value);
+    const wrap = $('illustrationWrap');
+    if (ex) {
+      wrap.innerHTML = `${ex.illustration}<div class="muscle-label">${ex.muscles.map(m => muscleNames[m]).join(', ')}</div>`;
+    } else {
+      wrap.innerHTML = `${defaultIllustration}<div class="muscle-label"></div>`;
+    }
+  }
+  $('exerciseName').addEventListener('input', updateExerciseView);
 
   onAuthStateChanged(auth, (user) => {
     currentUser = user;
@@ -403,50 +859,41 @@ function startApp() {
     setTimeout(() => ($('saveKey').textContent = 'Tallenna avain'), 1500);
   });
 
-  let currentSets = [10];
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t === tab));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+      const target = tab.dataset.tab === 'train' ? 'tabTrain' : 'tabWiki';
+      $(target).classList.remove('hidden');
+      if (tab.dataset.tab === 'wiki') renderWiki();
+    });
+  });
 
-  function draftKey() {
-    return 'gym_draft_' + (currentUser ? currentUser.uid : 'anon');
+  function renderWiki(filter = '') {
+    const list = $('wikiList');
+    const f = filter.trim().toLowerCase();
+    const items = exerciseDb.filter(e => {
+      if (!f) return true;
+      const all = `${e.name} ${e.nameEn} ${e.aliases.join(' ')} ${e.muscles.map(m => muscleNames[m]).join(' ')}`.toLowerCase();
+      return all.includes(f);
+    });
+    if (items.length === 0) {
+      list.innerHTML = '<div class="empty">Ei osumia.</div>';
+      return;
+    }
+    list.innerHTML = items.map(e => `
+      <div class="wiki-item">
+        <div class="wiki-illustration">${e.illustration}</div>
+        <div class="wiki-content">
+          <h3>${escapeHtml(e.name)} <span class="alt">/ ${escapeHtml(e.nameEn)}</span></h3>
+          <div class="tags">${e.muscles.map(m => `<span class="tag">${muscleNames[m]}</span>`).join('')}</div>
+          <p>${escapeHtml(e.description)}</p>
+          <p class="tip"><strong>Vinkki:</strong> ${escapeHtml(e.tips)}</p>
+        </div>
+      </div>
+    `).join('');
   }
-  function saveDraft() {
-    if (!currentUser) return;
-    try {
-      localStorage.setItem(draftKey(), JSON.stringify({
-        date: $('sessionDate').value,
-        exercises: currentExercises,
-        pendingExercise: {
-          name: $('exerciseName').value,
-          weight: parseFloat($('exerciseWeight').value) || 0,
-          sets: currentSets,
-        },
-      }));
-    } catch {}
-  }
-  function loadDraft() {
-    if (!currentUser) return;
-    try {
-      const raw = localStorage.getItem(draftKey());
-      if (!raw) return;
-      const draft = JSON.parse(raw);
-      if (draft.date) $('sessionDate').value = draft.date;
-      if (Array.isArray(draft.exercises)) {
-        currentExercises = draft.exercises;
-        renderCurrentExercises();
-      }
-      if (draft.pendingExercise) {
-        $('exerciseName').value = draft.pendingExercise.name || '';
-        const w = draft.pendingExercise.weight;
-        $('exerciseWeight').value = (w !== undefined && w !== null) ? w : '0';
-        const sets = Array.isArray(draft.pendingExercise.sets) ? draft.pendingExercise.sets : [];
-        currentSets = sets.length > 0 ? sets : [10];
-        renderSets();
-      }
-    } catch {}
-  }
-  function clearDraft() {
-    if (!currentUser) return;
-    try { localStorage.removeItem(draftKey()); } catch {}
-  }
+  $('wikiSearch').addEventListener('input', () => renderWiki($('wikiSearch').value));
 
   function renderSets() {
     const list = $('setsList');
@@ -479,6 +926,7 @@ function startApp() {
     });
   }
   renderSets();
+  updateExerciseView();
 
   $('addSet').addEventListener('click', () => {
     const last = currentSets[currentSets.length - 1] || 10;
@@ -506,18 +954,9 @@ function startApp() {
   function addExercise() {
     const name = $('exerciseName').value.trim();
     const weight = parseFloat($('exerciseWeight').value);
-    if (!name) {
-      alert('Valitse tai kirjoita liikkeen nimi.');
-      return;
-    }
-    if (isNaN(weight) || weight < 0) {
-      alert('Anna kelvollinen paino.');
-      return;
-    }
-    if (currentSets.length === 0) {
-      alert('Lisää vähintään yksi sarja.');
-      return;
-    }
+    if (!name) { alert('Valitse tai kirjoita liikkeen nimi.'); return; }
+    if (isNaN(weight) || weight < 0) { alert('Anna kelvollinen paino.'); return; }
+    if (currentSets.length === 0) { alert('Lisää vähintään yksi sarja.'); return; }
     const reps = currentSets.join('+');
     currentExercises.push({ name, weight, reps });
     $('exerciseName').value = '';
@@ -525,16 +964,14 @@ function startApp() {
     currentSets = [10];
     renderSets();
     renderCurrentExercises();
+    updateExerciseView();
     saveDraft();
     $('exerciseName').focus();
   }
 
   function renderCurrentExercises() {
     const list = $('exercisesList');
-    if (currentExercises.length === 0) {
-      list.innerHTML = '';
-      return;
-    }
+    if (currentExercises.length === 0) { list.innerHTML = ''; return; }
     list.innerHTML = currentExercises.map((ex, i) => `
       <div class="exercise-item">
         <span><strong>${escapeHtml(ex.name)}</strong> — ${ex.weight}kg × ${escapeHtml(ex.reps)}</span>
@@ -552,15 +989,9 @@ function startApp() {
 
   $('submitSession').addEventListener('click', async () => {
     if (!currentUser) return;
-    if (currentExercises.length === 0) {
-      alert('Lisää vähintään yksi liike.');
-      return;
-    }
+    if (currentExercises.length === 0) { alert('Lisää vähintään yksi liike.'); return; }
     const apiKey = localStorage.getItem('gemini_api_key');
-    if (!apiKey) {
-      alert('Aseta ensin Gemini API-avaimesi (API-asetukset).');
-      return;
-    }
+    if (!apiKey) { alert('Aseta ensin Gemini API-avaimesi (API-asetukset).'); return; }
 
     const date = $('sessionDate').value;
     const exercises = {};
