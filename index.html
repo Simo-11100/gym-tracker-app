@@ -197,6 +197,22 @@ code { background: var(--bg); padding: 0.1rem 0.3rem; border-radius: 4px; font-s
   border-radius: 8px;
 }
 .set-row .remove-btn:hover { border-color: var(--danger); }
+html { color-scheme: dark; }
+.step-btn[data-weight^="-"],
+.step-btn[data-rep-delta^="-"] { color: var(--danger); border-color: rgba(248, 113, 113, 0.35); }
+.step-btn[data-weight]:not([data-weight^="-"]),
+.step-btn[data-rep-delta]:not([data-rep-delta^="-"]) { color: var(--accent); border-color: rgba(74, 222, 128, 0.35); }
+.weight-buttons {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 0.4rem;
+  margin-top: 0.4rem;
+}
+.weight-buttons .step-btn {
+  min-width: 0;
+  padding: 0.55rem 0.2rem;
+  font-size: 0.85rem;
+}
 @media (max-width: 480px) {
   .step-btn { min-width: 2.3rem; padding: 0.45rem 0.4rem; font-size: 0.9rem; }
   .set-label { flex: 0 0 3.5rem; font-size: 0.78rem; }
@@ -246,63 +262,41 @@ Avaa <code>index.html</code> ja korvaa <code>firebaseConfig</code>-objekti omill
         <label for="exerciseName">Liike</label>
         <input type="text" id="exerciseName" list="exerciseList" placeholder="Aloita kirjoittaminen tai valitse listalta…" autocomplete="off">
         <datalist id="exerciseList">
-          <option value="Penkkipunnerrus"></option>
-          <option value="Vinopenkkipunnerrus"></option>
-          <option value="Pystypunnerrus"></option>
-          <option value="Sivuvipunosto"></option>
-          <option value="Etuvipunosto"></option>
-          <option value="Hauiskääntö"></option>
-          <option value="Ojentajan punnerrus"></option>
-          <option value="Kyykky"></option>
-          <option value="Etukyykky"></option>
-          <option value="Maastaveto"></option>
-          <option value="Romanialainen maastaveto"></option>
-          <option value="Reisiojennus"></option>
-          <option value="Reisikoukistus"></option>
-          <option value="Pohjepunnerrus"></option>
-          <option value="Pakaranojennus"></option>
-          <option value="Leuanveto"></option>
-          <option value="Dippi"></option>
-          <option value="Kulmasoutu"></option>
-          <option value="Ylätalja"></option>
-          <option value="Alatalja"></option>
-          <option value="Lankku"></option>
-          <option value="Vatsarutistus"></option>
-          <option value="Etunoja"></option>
-          <option value="Selän ojennus"></option>
-          <option value="Bench press"></option>
-          <option value="Incline bench press"></option>
-          <option value="Overhead press"></option>
-          <option value="Lateral raise"></option>
-          <option value="Front raise"></option>
-          <option value="Bicep curl"></option>
-          <option value="Tricep extension"></option>
-          <option value="Squat"></option>
-          <option value="Front squat"></option>
-          <option value="Deadlift"></option>
-          <option value="Romanian deadlift"></option>
-          <option value="Leg extension"></option>
-          <option value="Leg curl"></option>
-          <option value="Calf raise"></option>
-          <option value="Hip thrust"></option>
-          <option value="Pull-up"></option>
-          <option value="Dip"></option>
-          <option value="Barbell row"></option>
-          <option value="Lat pulldown"></option>
-          <option value="Cable row"></option>
-          <option value="Plank"></option>
-          <option value="Crunch"></option>
-          <option value="Push-up"></option>
-          <option value="Back extension"></option>
+          <option value="Penkkipunnerrus / Bench press"></option>
+          <option value="Vinopenkkipunnerrus / Incline bench press"></option>
+          <option value="Pystypunnerrus / Overhead press"></option>
+          <option value="Sivuvipunosto / Lateral raise"></option>
+          <option value="Etuvipunosto / Front raise"></option>
+          <option value="Hauiskääntö / Bicep curl"></option>
+          <option value="Ojentajan punnerrus / Tricep extension"></option>
+          <option value="Kyykky / Squat"></option>
+          <option value="Etukyykky / Front squat"></option>
+          <option value="Maastaveto / Deadlift"></option>
+          <option value="Romanialainen maastaveto / Romanian deadlift"></option>
+          <option value="Reisiojennus / Leg extension"></option>
+          <option value="Reisikoukistus / Leg curl"></option>
+          <option value="Pohjepunnerrus / Calf raise"></option>
+          <option value="Pakaranojennus / Hip thrust"></option>
+          <option value="Leuanveto / Pull-up"></option>
+          <option value="Dippi / Dip"></option>
+          <option value="Kulmasoutu / Barbell row"></option>
+          <option value="Ylätalja / Lat pulldown"></option>
+          <option value="Alatalja / Cable row"></option>
+          <option value="Lankku / Plank"></option>
+          <option value="Vatsarutistus / Crunch"></option>
+          <option value="Etunoja / Push-up"></option>
+          <option value="Selän ojennus / Back extension"></option>
         </datalist>
       </div>
 
       <div class="form-row">
         <label>Paino (kg)</label>
-        <div class="stepper">
+        <input type="number" id="exerciseWeight" min="0" step="0.5" value="0" inputmode="decimal">
+        <div class="weight-buttons">
           <button type="button" class="step-btn" data-weight="-5">−5</button>
           <button type="button" class="step-btn" data-weight="-1">−1</button>
-          <input type="number" id="exerciseWeight" min="0" step="0.5" value="0" inputmode="decimal">
+          <button type="button" class="step-btn" data-weight="-0.5">−0.5</button>
+          <button type="button" class="step-btn" data-weight="0.5">+0.5</button>
           <button type="button" class="step-btn" data-weight="1">+1</button>
           <button type="button" class="step-btn" data-weight="5">+5</button>
         </div>
@@ -384,6 +378,7 @@ function startApp() {
       out.addEventListener('click', () => signOut(auth));
       $('userInfo').append(label, out);
       renderHistory();
+      loadDraft();
     } else {
       $('signInCard').style.display = 'block';
       $('appArea').style.display = 'none';
@@ -410,6 +405,49 @@ function startApp() {
 
   let currentSets = [10];
 
+  function draftKey() {
+    return 'gym_draft_' + (currentUser ? currentUser.uid : 'anon');
+  }
+  function saveDraft() {
+    if (!currentUser) return;
+    try {
+      localStorage.setItem(draftKey(), JSON.stringify({
+        date: $('sessionDate').value,
+        exercises: currentExercises,
+        pendingExercise: {
+          name: $('exerciseName').value,
+          weight: parseFloat($('exerciseWeight').value) || 0,
+          sets: currentSets,
+        },
+      }));
+    } catch {}
+  }
+  function loadDraft() {
+    if (!currentUser) return;
+    try {
+      const raw = localStorage.getItem(draftKey());
+      if (!raw) return;
+      const draft = JSON.parse(raw);
+      if (draft.date) $('sessionDate').value = draft.date;
+      if (Array.isArray(draft.exercises)) {
+        currentExercises = draft.exercises;
+        renderCurrentExercises();
+      }
+      if (draft.pendingExercise) {
+        $('exerciseName').value = draft.pendingExercise.name || '';
+        const w = draft.pendingExercise.weight;
+        $('exerciseWeight').value = (w !== undefined && w !== null) ? w : '0';
+        const sets = Array.isArray(draft.pendingExercise.sets) ? draft.pendingExercise.sets : [];
+        currentSets = sets.length > 0 ? sets : [10];
+        renderSets();
+      }
+    } catch {}
+  }
+  function clearDraft() {
+    if (!currentUser) return;
+    try { localStorage.removeItem(draftKey()); } catch {}
+  }
+
   function renderSets() {
     const list = $('setsList');
     list.innerHTML = currentSets.map((reps, i) => `
@@ -427,6 +465,7 @@ function startApp() {
         const d = parseInt(b.dataset.repDelta, 10);
         currentSets[i] = Math.max(1, currentSets[i] + d);
         renderSets();
+        saveDraft();
       });
     });
     list.querySelectorAll('[data-remove-set]').forEach(b => {
@@ -435,6 +474,7 @@ function startApp() {
         currentSets.splice(i, 1);
         if (currentSets.length === 0) currentSets = [10];
         renderSets();
+        saveDraft();
       });
     });
   }
@@ -444,6 +484,7 @@ function startApp() {
     const last = currentSets[currentSets.length - 1] || 10;
     currentSets.push(last);
     renderSets();
+    saveDraft();
   });
 
   document.querySelectorAll('[data-weight]').forEach(b => {
@@ -452,8 +493,13 @@ function startApp() {
       const input = $('exerciseWeight');
       const current = parseFloat(input.value) || 0;
       input.value = Math.max(0, +(current + delta).toFixed(2));
+      saveDraft();
     });
   });
+
+  $('exerciseName').addEventListener('input', saveDraft);
+  $('exerciseWeight').addEventListener('input', saveDraft);
+  $('sessionDate').addEventListener('input', saveDraft);
 
   $('addExercise').addEventListener('click', addExercise);
 
@@ -479,6 +525,7 @@ function startApp() {
     currentSets = [10];
     renderSets();
     renderCurrentExercises();
+    saveDraft();
     $('exerciseName').focus();
   }
 
@@ -498,6 +545,7 @@ function startApp() {
       btn.addEventListener('click', () => {
         currentExercises.splice(parseInt(btn.dataset.remove, 10), 1);
         renderCurrentExercises();
+        saveDraft();
       });
     });
   }
@@ -534,6 +582,7 @@ function startApp() {
 
     try {
       await addDoc(collection(db, 'users', currentUser.uid, 'sessions'), session);
+      clearDraft();
     } catch (e) {
       $('response').innerHTML = `<div class="error">Tallennus epäonnistui: ${escapeHtml(e.message)}</div>`;
       btn.disabled = false;
