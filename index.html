@@ -994,10 +994,11 @@ function startApp() {
     if (!apiKey) { alert('Aseta ensin Gemini API-avaimesi (API-asetukset).'); return; }
 
     const date = $('sessionDate').value;
-    const exercises = {};
-    for (const ex of currentExercises) {
-      exercises[ex.name] = { weight: ex.weight, reps: ex.reps };
-    }
+    const exercises = currentExercises.map(ex => ({
+      name: ex.name,
+      weight: ex.weight,
+      reps: ex.reps,
+    }));
     const session = {
       name: `Training ${date}`,
       date,
@@ -1050,16 +1051,22 @@ function startApp() {
     return snap.docs.map(d => ({ id: d.id, ...d.data() }));
   }
 
+  function exercisesToList(ex) {
+    if (!ex) return [];
+    if (Array.isArray(ex)) return ex;
+    return Object.entries(ex).map(([name, v]) => ({ name, weight: v.weight, reps: v.reps }));
+  }
+
   async function getRecommendation(currentSession, allHistory, apiKey) {
     const prior = allHistory.slice(1);
     const priorText = prior.length === 0
       ? 'Ei aiempaa historiaa.'
-      : prior.map(s => `${s.name}:\n${Object.entries(s.exercises).map(([k, v]) => `  - ${k}: ${v.weight}kg × ${v.reps}`).join('\n')}`).join('\n\n');
+      : prior.map(s => `${s.name}:\n${exercisesToList(s.exercises).map(e => `  - ${e.name}: ${e.weight}kg × ${e.reps}`).join('\n')}`).join('\n\n');
 
-    const prompt = `Olet kuntosalivalmentaja. Käy läpi nykyinen harjoitus ja aiempi historia ja kerro jokaiselle liikkeelle erikseen: pidetäänkö sama paino seuraavalla kerralla vai nostetaanko (ja jos nostetaan, niin kuinka paljon).
+    const prompt = `Olet kuntosalivalmentaja. Käy läpi nykyinen harjoitus ja aiempi historia ja kerro jokaiselle liikkeelle erikseen: pidetäänkö sama paino seuraavalla kerralla vai nostetaanko (ja jos nostetaan, niin kuinka paljon). Sama liike voi esiintyä useita kertoja samassa harjoituksessa eri painolla (esim. lämmittelysarjat ja työsarjat) — käsittele ne yhdessä.
 
 Nykyinen harjoitus (${currentSession.date}):
-${Object.entries(currentSession.exercises).map(([k, v]) => `- ${k}: ${v.weight}kg × ${v.reps}`).join('\n')}
+${exercisesToList(currentSession.exercises).map(e => `- ${e.name}: ${e.weight}kg × ${e.reps}`).join('\n')}
 
 Aiemmat harjoitukset:
 ${priorText}
