@@ -85,11 +85,27 @@ button.danger {
   justify-content: space-between;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.5rem 0.75rem;
+  padding: 0.55rem 0.75rem;
   background: var(--bg);
   border-radius: 6px;
   margin-bottom: 0.4rem;
   font-size: 0.9rem;
+}
+.exercise-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+.exercise-info .exercise-name {
+  font-weight: 600;
+  word-break: break-word;
+  line-height: 1.25;
+}
+.exercise-info .exercise-detail {
+  font-size: 0.82rem;
+  color: var(--muted);
 }
 label {
   font-size: 0.85rem;
@@ -421,6 +437,16 @@ const exerciseDb = [
     illustration: `<svg viewBox="0 0 100 70" xmlns="http://www.w3.org/2000/svg"><rect x="14" y="42" width="72" height="4" fill="#666"/><line x1="22" y1="46" x2="22" y2="62" stroke="#666" stroke-width="3"/><line x1="78" y1="46" x2="78" y2="62" stroke="#666" stroke-width="3"/><line x1="22" y1="40" x2="78" y2="40" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><circle cx="22" cy="38" r="4" fill="none" stroke="currentColor" stroke-width="2"/><line x1="50" y1="40" x2="50" y2="22" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="50" y1="22" x2="42" y2="14" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="50" y1="22" x2="58" y2="14" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="30" y1="11" x2="70" y2="11" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><rect x="26" y="6" width="4" height="11" fill="currentColor"/><rect x="70" y="6" width="4" height="11" fill="currentColor"/></svg>`,
   },
   {
+    key: 'penkkipunnerruskasipainoilla',
+    aliases: ['penkki käsipain', 'dumbbell bench', 'db bench', 'kasipaino penkki'],
+    name: 'Penkkipunnerrus käsipainoilla',
+    nameEn: 'Dumbbell bench press',
+    muscles: ['chest', 'shoulders', 'arms'],
+    description: 'Makuulla penkillä käsipainot ojennettuna ylös, kämmenet eteenpäin. Laske käsipainot rinnan sivuille, kunnes kyynärpäät ovat hieman alle hartialinjan. Työnnä takaisin ylös ja vie käsipainot lähelle toisiaan yläasennossa.',
+    tips: 'Liikealue on suurempi kuin tangolla, mikä venyttää rintaa enemmän — mutta tarvitset ~60–70 % siitä painosta. Tasaa puolieroa. Tarvitsee usein apurin painojen nostamiseen lähtöasentoon.',
+    illustration: `<svg viewBox="0 0 100 70" xmlns="http://www.w3.org/2000/svg"><rect x="14" y="42" width="72" height="4" fill="#666"/><line x1="22" y1="46" x2="22" y2="62" stroke="#666" stroke-width="3"/><line x1="78" y1="46" x2="78" y2="62" stroke="#666" stroke-width="3"/><line x1="22" y1="40" x2="78" y2="40" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><circle cx="22" cy="38" r="4" fill="none" stroke="currentColor" stroke-width="2"/><line x1="46" y1="40" x2="38" y2="22" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="54" y1="40" x2="62" y2="22" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><rect x="30" y="14" width="14" height="8" fill="currentColor" rx="1"/><rect x="56" y="14" width="14" height="8" fill="currentColor" rx="1"/></svg>`,
+  },
+  {
     key: 'vinopenkkipunnerrus',
     aliases: ['vinopenkki', 'incline', 'incline bench'],
     name: 'Vinopenkkipunnerrus',
@@ -431,6 +457,16 @@ const exerciseDb = [
     illustration: `<svg viewBox="0 0 100 70" xmlns="http://www.w3.org/2000/svg"><line x1="14" y1="58" x2="86" y2="28" stroke="#666" stroke-width="4" stroke-linecap="round"/><line x1="20" y1="58" x2="20" y2="68" stroke="#666" stroke-width="3"/><line x1="80" y1="32" x2="80" y2="42" stroke="#666" stroke-width="3"/><line x1="28" y1="52" x2="72" y2="30" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><circle cx="74" cy="29" r="4" fill="none" stroke="currentColor" stroke-width="2"/><line x1="50" y1="42" x2="48" y2="22" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="48" y1="22" x2="40" y2="16" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="48" y1="22" x2="56" y2="16" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="30" y1="14" x2="66" y2="14" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><rect x="26" y="9" width="4" height="11" fill="currentColor"/><rect x="66" y="9" width="4" height="11" fill="currentColor"/></svg>`,
   },
   {
+    key: 'vinopenkkikasipainoilla',
+    aliases: ['vinopenkki käsipain', 'incline dumbbell', 'incline db'],
+    name: 'Vinopenkkipunnerrus käsipainoilla',
+    nameEn: 'Incline dumbbell press',
+    muscles: ['chest', 'shoulders', 'arms'],
+    description: 'Vinopenkki 15–30°, käsipainot ojennettuna ylös ylärinnan päällä. Laske käsipainot rintakehän yläosan sivuille ja työnnä takaisin yhteen.',
+    tips: 'Korostaa rinnan yläosaa. Käsipainoilla yleensä parempi kuin tangolla — sallii luonnollisen ranteen asennon ja paremman venytyksen. Penkkin saaminen lähtöasentoon helpompi kahdella kevyemmällä kuin yhdellä raskaalla tangolla.',
+    illustration: `<svg viewBox="0 0 100 70" xmlns="http://www.w3.org/2000/svg"><line x1="14" y1="58" x2="86" y2="28" stroke="#666" stroke-width="4" stroke-linecap="round"/><line x1="20" y1="58" x2="20" y2="68" stroke="#666" stroke-width="3"/><line x1="80" y1="32" x2="80" y2="42" stroke="#666" stroke-width="3"/><line x1="28" y1="52" x2="72" y2="30" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><circle cx="74" cy="29" r="4" fill="none" stroke="currentColor" stroke-width="2"/><line x1="46" y1="42" x2="38" y2="22" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="56" y1="40" x2="62" y2="20" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><rect x="30" y="14" width="14" height="8" fill="currentColor" rx="1"/><rect x="56" y="12" width="14" height="8" fill="currentColor" rx="1"/></svg>`,
+  },
+  {
     key: 'pystypunnerrus',
     aliases: ['pystypunner', 'overhead', 'ohp', 'military press', 'olkapunner'],
     name: 'Pystypunnerrus',
@@ -439,6 +475,16 @@ const exerciseDb = [
     description: 'Seisten tanko olkapäiden tasolla, jalat hartioiden leveydellä. Työnnä tanko suoraan ylös pään yli kunnes kädet ovat suorina. Laske hallitusti takaisin.',
     tips: 'Pidä keskivartalo tiukkana ja pakarat napakat — tämä estää selän taipumisen. Älä tee samana päivänä raskaan penkin kanssa, olkanivel rasittuu.',
     illustration: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="38" r="5" fill="none" stroke="currentColor" stroke-width="2"/><line x1="50" y1="43" x2="50" y2="72" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><line x1="50" y1="48" x2="38" y2="35" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="50" y1="48" x2="62" y2="35" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="38" y1="35" x2="38" y2="22" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="62" y1="35" x2="62" y2="22" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="22" y1="20" x2="78" y2="20" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><rect x="18" y="14" width="4" height="12" fill="currentColor"/><rect x="78" y="14" width="4" height="12" fill="currentColor"/><line x1="50" y1="72" x2="42" y2="92" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><line x1="50" y1="72" x2="58" y2="92" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>`,
+  },
+  {
+    key: 'pystypunnerruskasipainoilla',
+    aliases: ['pysty käsipain', 'dumbbell shoulder press', 'db shoulder', 'arnold press'],
+    name: 'Pystypunnerrus käsipainoilla',
+    nameEn: 'Dumbbell shoulder press',
+    muscles: ['shoulders', 'arms', 'core'],
+    description: 'Istuen (mielellään selkätuella) tai seisten käsipainot hartioiden tasolla, kämmenet eteenpäin. Työnnä käsipainot suoraan ylös kunnes kädet ovat suorina, mutta älä lyö niitä yhteen. Palaa hallitusti hartioille.',
+    tips: 'Sallii suuremman liikealueen kuin tanko ja erillisen kuormituksen molemmille puolille. Käytä ~70 % tangon painosta. Istuminen tukirin kanssa estää selän taipumisen taakse.',
+    illustration: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="38" r="5" fill="none" stroke="currentColor" stroke-width="2"/><line x1="50" y1="43" x2="50" y2="72" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><line x1="50" y1="48" x2="36" y2="32" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="50" y1="48" x2="64" y2="32" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="36" y1="32" x2="36" y2="20" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="64" y1="32" x2="64" y2="20" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><rect x="28" y="14" width="16" height="8" fill="currentColor" rx="1"/><rect x="56" y="14" width="16" height="8" fill="currentColor" rx="1"/><line x1="50" y1="72" x2="42" y2="92" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><line x1="50" y1="72" x2="58" y2="92" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>`,
   },
   {
     key: 'sivuvipunosto',
@@ -469,6 +515,16 @@ const exerciseDb = [
     description: 'Seisten käsipainot tai tanko reisien edessä, kämmenet eteenpäin. Koukista kyynärpäät ja nosta paino olkapäille. Laske hallitusti.',
     tips: 'Kyynärpäät pysyvät kyljessä — jos ne lähtevät eteen, käytät hartioita. Vältä kehon heilauttamista.',
     illustration: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="22" r="5" fill="none" stroke="currentColor" stroke-width="2"/><line x1="50" y1="27" x2="50" y2="62" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><line x1="50" y1="35" x2="40" y2="50" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="50" y1="35" x2="60" y2="50" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="40" y1="50" x2="46" y2="32" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="60" y1="50" x2="54" y2="32" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><rect x="40" y="26" width="12" height="8" fill="currentColor" rx="1"/><rect x="48" y="26" width="12" height="8" fill="currentColor" rx="1"/><line x1="50" y1="62" x2="42" y2="90" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><line x1="50" y1="62" x2="58" y2="90" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>`,
+  },
+  {
+    key: 'hauiskaantotangolla',
+    aliases: ['hauis tango', 'barbell curl', 'ez curl', 'ez-tanko hauis'],
+    name: 'Hauiskääntö tangolla',
+    nameEn: 'Barbell curl',
+    muscles: ['arms'],
+    description: 'Seisten suora tanko tai EZ-tanko reisien edessä, kämmenet ylöspäin. Koukista kyynärpäät ja nosta tanko olkapäille. Laske hallitusti.',
+    tips: 'Tangolla saa raskaammat painot, mutta ranne kuormittuu enemmän — EZ-tanko helpottaa. Kyynärpäät pysyvät kyljessä koko liikkeen ajan. Älä heilauta vartaloa.',
+    illustration: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="22" r="5" fill="none" stroke="currentColor" stroke-width="2"/><line x1="50" y1="27" x2="50" y2="62" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><line x1="50" y1="35" x2="40" y2="50" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="50" y1="35" x2="60" y2="50" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="40" y1="50" x2="44" y2="34" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="60" y1="50" x2="56" y2="34" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="32" y1="32" x2="68" y2="32" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><rect x="28" y="27" width="4" height="10" fill="currentColor"/><rect x="68" y="27" width="4" height="10" fill="currentColor"/><line x1="50" y1="62" x2="42" y2="90" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><line x1="50" y1="62" x2="58" y2="90" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>`,
   },
   {
     key: 'vasarakaanto',
@@ -974,7 +1030,10 @@ function startApp() {
     if (currentExercises.length === 0) { list.innerHTML = ''; return; }
     list.innerHTML = currentExercises.map((ex, i) => `
       <div class="exercise-item">
-        <span><strong>${escapeHtml(ex.name)}</strong> — ${ex.weight}kg × ${escapeHtml(ex.reps)}</span>
+        <div class="exercise-info">
+          <span class="exercise-name">${escapeHtml(ex.name)}</span>
+          <span class="exercise-detail">${ex.weight}kg × ${escapeHtml(ex.reps)}</span>
+        </div>
         <button class="danger" data-remove="${i}">Poista</button>
       </div>
     `).join('');
