@@ -1133,7 +1133,11 @@ ${priorText}
 Vastaa jokaiselle liikkeelle omalle rivilleen muodossa:
 - <Liike>: PIDÄ <paino>kg — <lyhyt perustelu>
 - <Liike>: NOSTA <paino>kg — <lyhyt perustelu>
-Ole lyhytsanainen ja käytännöllinen.`;
+
+TÄRKEÄÄ:
+- Kirjoita aina täydet lauseet. ÄLÄ käytä "..." tai katkaise sanaa kesken.
+- Pidä jokainen perustelu enintään 15 sanaa, mutta KOKO LAUSE.
+- Jos tila loppuu kesken, jätä mieluummin liike pois kuin katkaise lauseen.`;
 
     const res = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${encodeURIComponent(apiKey)}`,
@@ -1142,7 +1146,7 @@ Ole lyhytsanainen ja käytännöllinen.`;
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({
           contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: { temperature: 0.4, maxOutputTokens: 1024 },
+          generationConfig: { temperature: 0.4, maxOutputTokens: 4096 },
         }),
       }
     );
@@ -1151,9 +1155,13 @@ Ole lyhytsanainen ja käytännöllinen.`;
       throw new Error(`${res.status}: ${errText}`);
     }
     const data = await res.json();
-    const text = data?.candidates?.[0]?.content?.parts?.map(p => p.text).join('') || '';
+    const candidate = data?.candidates?.[0];
+    const text = candidate?.content?.parts?.map(p => p.text).join('') || '';
     if (!text) throw new Error('Tyhjä vastaus Geminiltä.');
-    return text.trim();
+    const truncated = candidate?.finishReason === 'MAX_TOKENS';
+    return truncated
+      ? text.trim() + '\n\n⚠️ Vastaus katkesi token-rajaan. Tee vähemmän liikkeitä per session tai jaa harjoitukset.'
+      : text.trim();
   }
 
   async function renderHistory() {
