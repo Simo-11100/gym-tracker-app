@@ -1131,27 +1131,69 @@ function startApp() {
   }
 
   async function getRecommendation(currentSession, allHistory, apiKey) {
-    const prior = allHistory.slice(1);
-    const priorText = prior.length === 0
-      ? 'Ei aiempaa historiaa.'
-      : prior.map(s => `${s.name}:\n${exercisesToList(s.exercises).map(e => `  - ${e.name}: ${e.weight}kg × ${e.reps}`).join('\n')}`).join('\n\n');
+    const HISTORY_DAYS = 14;
 
-    const prompt = `Olet kuntosalivalmentaja. Käy läpi nykyinen harjoitus ja aiempi historia ja kerro jokaiselle liikkeelle erikseen: pidetäänkö sama paino seuraavalla kerralla vai nostetaanko (ja jos nostetaan, niin kuinka paljon). Sama liike voi esiintyä useita kertoja samassa harjoituksessa eri painolla (esim. lämmittelysarjat ja työsarjat) — käsittele ne yhdessä.
+    // Group history by date and take last N unique gym days.
+    // Same-day sessions are merged into one block for clarity.
+    const byDate = new Map();
+    const orderedDates = [];
+    for (const s of allHistory.slice(1)) {
+      if (!byDate.has(s.date)) {
+        if (orderedDates.length >= HISTORY_DAYS) break;
+        byDate.set(s.date, []);
+        orderedDates.push(s.date);
+      }
+      byDate.get(s.date).push(s);
+    }
+
+    const priorText = orderedDates.length === 0
+      ? 'Ei aiempaa historiaa.'
+      : orderedDates.map(date => {
+          const sessions = byDate.get(date);
+          const allEx = sessions.flatMap(s => exercisesToList(s.exercises));
+          return `Salipäivä ${date} (${sessions.length} session${sessions.length === 1 ? '' : 'ia'}):\n${allEx.map(e => `  - ${e.name}: ${e.weight}kg × ${e.reps}`).join('\n')}`;
+        }).join('\n\n');
+
+    const exerciseListText = exerciseDb.map(e =>
+      `- ${e.name} / ${e.nameEn} (${e.muscles.map(m => muscleNames[m]).join(', ')})`
+    ).join('\n');
+
+    const prompt = `Olet kuntosalivalmentaja. Vastaa KAHDESSA OSASSA: 1) paino-suositukset nykyisen harjoituksen liikkeille, 2) monipuolisuussuositukset seuraavalle treenille.
+
+================================
+OSA 1: PAINOT NYKYISILLE LIIKKEILLE
+================================
 
 Nykyinen harjoitus (${currentSession.date}):
 ${exercisesToList(currentSession.exercises).map(e => `- ${e.name}: ${e.weight}kg × ${e.reps}`).join('\n')}
 
-Aiemmat harjoitukset:
+Aiemmat treenipäivät (uusin ensin, max ${HISTORY_DAYS} salipäivää):
 ${priorText}
 
-Vastaa jokaiselle liikkeelle omalle rivilleen muodossa:
-- <Liike>: PIDÄ <paino>kg — <lyhyt perustelu>
-- <Liike>: NOSTA <paino>kg — <lyhyt perustelu>
+Käy jokainen nykyisen harjoituksen liike läpi. Jos sama liike esiintyy useita kertoja eri painolla (esim. lämmittely + työsarjat), käsittele ne yhdessä. Vastaa muodossa:
+- <Liike>: PIDÄ <paino>kg — <perustelu>
+- <Liike>: NOSTA <paino>kg — <perustelu>
 
-TÄRKEÄÄ:
+================================
+OSA 2: MONIPUOLISUUSSUOSITUKSET
+================================
+
+Analysoi yllä olevien harjoitusten lihasryhmäjakaumaa. Mitkä lihasryhmät ovat olleet aliedustettuja viime aikoina? Suosittele 2–4 liikettä alla olevasta listasta, jotka tasapainottaisivat treenirutiinia.
+
+Käytettävissä olevat liikkeet (suosittele VAIN näistä):
+${exerciseListText}
+
+Vastaa muodossa:
+SEURAAVAKSI HARKITSE:
+- <Liike> (<lihasryhmät>) — <miksi tämä täydentäisi treeniäsi yhdellä lauseella>
+
+================================
+SÄÄNNÖT
+================================
 - Kirjoita aina täydet lauseet. ÄLÄ käytä "..." tai katkaise sanaa kesken.
-- Pidä jokainen perustelu enintään 15 sanaa, mutta KOKO LAUSE.
-- Jos tila loppuu kesken, jätä mieluummin liike pois kuin katkaise lauseen.`;
+- Pidä jokainen perustelu enintään 15 sanaa mutta KOKO LAUSE.
+- ÄLÄ keksi liikkeitä yli annetun listan.
+- Suosittele Osassa 2 liikkeitä joita käyttäjä EI ole tehnyt viime aikoina TAI jotka osuvat aliedustettuihin lihasryhmiin.`;
 
     const res = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${encodeURIComponent(apiKey)}`,
