@@ -400,6 +400,20 @@ Avaa <code>index.html</code> ja korvaa <code>firebaseConfig</code>-objekti omill
         <h2>Historia</h2>
         <div id="history"></div>
       </div>
+
+      <div class="card">
+        <h2>Synkronoi Sheetiin</h2>
+        <p class="hint">Lähetä treenit Google Sheetiin (terveyspersoona lukee ne). Voit painaa monta kertaa — jo lähetetyt ohitetaan.</p>
+        <label for="syncPassword" style="margin-top: 0.75rem;">Salasana</label>
+        <input type="password" id="syncPassword" placeholder="Kirjoita lähetyssalasana" autocomplete="off" style="width: 100%;">
+        <div class="hint">Toinen turvakerros. Ei tallennu koodiin — kirjoita joka lähetyskerralla.</div>
+        <div style="display: grid; gap: 0.5rem; margin-top: 0.75rem;">
+          <button id="syncWeek" class="secondary">Lähetä tämän viikon tulokset</button>
+          <button id="syncMonth" class="secondary">Lähetä tämän kuukauden tulokset</button>
+          <button id="syncAll" class="secondary">Lähetä kaikki (synkronoi)</button>
+        </div>
+        <div id="syncStatus" style="margin-top: 0.75rem;"></div>
+      </div>
     </div>
 
     <div class="tab-content hidden" id="tabWiki">
@@ -427,6 +441,22 @@ const firebaseConfig = {
 };
 
 const GEMINI_MODEL = 'gemini-2.5-flash';
+
+/* ═══════════════════════════════════════════════════════════════════════
+   SHEET-SYNKRONOINTI — TÄYTÄ NÄMÄ KAKSI ARVOA
+   ═══════════════════════════════════════════════════════════════════════
+   1. SHEET_SYNC_URL: Apps Script Web App -osoite.
+      Apps Script editor -> Deploy -> New deployment -> Web app -> URL.
+      Muotoa: https://script.google.com/macros/s/AKfyc.../exec
+
+   2. SHEET_SYNC_TOKEN: token jonka sait voimaAsetaToken()-funktiosta.
+
+   HUOM TIETOTURVA: token näkyy tämän sivun lähdekoodissa (kuten Firebase-
+   avaimesikin yllä). Pahin väärinkäyttö: joku voisi lisätä rivejä VAIN sinun
+   Voima-Sheetiisi — ei muuta. Henkilökohtaisessa käytössä riittävä suoja.
+   ═══════════════════════════════════════════════════════════════════════ */
+const SHEET_SYNC_URL   = "https://script.google.com/macros/s/AKfycbz2YFP1zDHZUfIPeqTjr4WHQi4OZYbwqP6aQj_af3h-jzZR2m2NaBnu0JPr5UWm4IjSvw/exec";
+const SHEET_SYNC_TOKEN = "71993bd25f054d2ca27a485cde9c38b8a9d7109d";
 const $ = (id) => document.getElementById(id);
 
 const muscleNames = {
@@ -1123,6 +1153,82 @@ function startApp() {
     const snap = await getDocs(q);
     return snap.docs.map(d => ({ id: d.id, ...d.data() }));
   }
+
+  /* ── SHEET-SYNKRONOINTI ─────────────────────────────────────────────── */
+
+  function ymd(d) { return d.toISOString().slice(0, 10); }
+
+  function alkuTallaViikolla() {
+    const d = new Date();
+    const day = (d.getDay() + 6) % 7;       // ma=0 ... su=6
+    d.setDate(d.getDate() - day);
+    d.setHours(0, 0, 0, 0);
+    return d;
+  }
+  function alkuTallaKuulla() {
+    const d = new Date();
+    return new Date(d.getFullYear(), d.getMonth(), 1);
+  }
+
+  /** Muotoile Firestore-treenit Apps Scriptin odottamaan muotoon. */
+  function valmisteleTreenit(sessions, alkuPvm) {
+    return sessions
+      .filter(s => !alkuPvm || (s.date && s.date >= ymd(alkuPvm)))
+      .map(s => ({
+        firestoreId: s.id,
+        date: s.date || '',
+        createdAt: s.createdAt || '',
+        name: s.name || '',
+        exercises: exercisesToList(s.exercises)   // olemassa oleva apuri (array-muoto)
+      }));
+  }
+
+  async function synkronoiSheetiin(alkuPvm, nimi) {
+    const status = $('syncStatus');
+    if (SHEET_SYNC_URL.startsWith('PASTE_') || SHEET_SYNC_TOKEN.startsWith('PASTE_')) {
+      status.innerHTML = '<div class="error">Aseta ensin SHEET_SYNC_URL ja SHEET_SYNC_TOKEN koodin alkuun.</div>';
+      return;
+    }
+    const salasana = ($('syncPassword') && $('syncPassword').value || '').trim();
+    if (!salasana) {
+      status.innerHTML = '<div class="error">Kirjoita salasana ennen lähetystä.</div>';
+      return;
+    }
+    status.innerHTML = '<div class="loading">Lähetetään (' + nimi + ')…</div>';
+
+    try {
+      const kaikki = await fetchHistory();
+      const treenit = valmisteleTreenit(kaikki, alkuPvm);
+      if (!treenit.length) {
+        status.innerHTML = '<div class="hint">Ei treenejä tältä ajanjaksolta.</div>';
+        return;
+      }
+
+      const res = await fetch(SHEET_SYNC_URL, {
+        method: 'POST',
+        // text/plain -> ei CORS-preflightiä (Apps Script ei käsittele sitä).
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ token: SHEET_SYNC_TOKEN, salasana: salasana, results: treenit })
+      });
+      const tulos = await res.json();
+
+      if (tulos.success) {
+        status.innerHTML = '<div class="response">✓ ' + nimi + ': lisätty ' +
+          (tulos.lisatty || 0) + ', ohitettu ' + (tulos.ohitettu || 0) + ' (jo Sheetissä).</div>';
+      } else {
+        status.innerHTML = '<div class="error">Lähetys epäonnistui: ' +
+          escapeHtml(tulos.error || 'tuntematon') + '. Data on silti Firestoressa.</div>';
+      }
+    } catch (e) {
+      status.innerHTML = '<div class="error">Verkkovirhe: ' + escapeHtml(e.message) +
+        '. Data on Firestoressa — yritä myöhemmin uudelleen.</div>';
+    }
+  }
+
+  const bW = $('syncWeek'), bM = $('syncMonth'), bA = $('syncAll');
+  if (bW) bW.addEventListener('click', () => synkronoiSheetiin(alkuTallaViikolla(), 'viikko'));
+  if (bM) bM.addEventListener('click', () => synkronoiSheetiin(alkuTallaKuulla(), 'kuukausi'));
+  if (bA) bA.addEventListener('click', () => synkronoiSheetiin(null, 'kaikki'));
 
   function exercisesToList(ex) {
     if (!ex) return [];
